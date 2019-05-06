@@ -1,0 +1,8 @@
+RewriteEngine on
+
+RewriteRule ^(.*)/(.*)$ index.php?endpoint=$1&method=$2 [NC,QSA]
+RewriteRule ^login$ index.php?method=signIn [NC,QSA]
+RewriteRule ^register$ index.php?method=signUp [NC,QSA]
+RewriteRule ^access$ index.php?method=access [NC,QSA]
+
+ErrorDocument 404 index.php?method=notFound

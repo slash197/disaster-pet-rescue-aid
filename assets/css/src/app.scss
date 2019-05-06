@@ -1,0 +1,34 @@
+/* 
+    Created on : May 6, 2019, 7:42:00 AM
+    Author     : Slash Web Design
+*/
+
+@import '_colors';
+@import '_splash';
+@import '_auth';
+@import '_helpers';
+
+html {
+	background: rgb(75,13,138);
+	background: linear-gradient(7deg, rgba(75,13,138,1) 0%, rgba(15,82,186,1) 100%); 
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+	
+	body {
+		background-color: transparent;
+		padding: 0px;
+		margin: 0px;
+		height: 100%;
+		font-family: Roboto;
+		font-size: 14px;
+		font-weight: 400;
+		color: $grey;
+		
+		#app {
+			height: 100%;
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+	}
+}

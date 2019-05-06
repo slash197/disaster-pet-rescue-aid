@@ -1,0 +1,48 @@
+/* 
+    Created on : May 6, 2019, 8:06:46 AM
+    Author     : Slash Web Design
+*/
+
+.splash {
+	height: 100%;
+	
+	div {
+		text-align: center;
+		
+		img {
+			margin-top: 100px;
+			max-width: 50%;
+		}
+	}
+	h1 {
+		font-weight: 400;
+		color: #ffffff;
+		text-transform: uppercase;
+		text-align: center;
+		width: 190px;
+		margin: 60px auto 100px auto;
+		
+		span {
+			display: block;
+		}
+		span:first-child,
+		span:last-child {
+			font-size: 18px;
+			line-height: 18px;
+		}
+		span:first-child {
+			text-align: left;
+		}
+		span:nth-child(2) {
+			font-size: 32px;
+			line-height: 27px;
+		}
+		span:last-child {
+			text-align: right;
+		}
+	}
+	p {
+		text-align: center;
+		margin: 40px 0px;
+	}
+}

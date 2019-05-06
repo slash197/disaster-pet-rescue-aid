@@ -1,0 +1,86 @@
+/* 
+    Created on : May 6, 2019, 9:24:36 AM
+    Author     : Slash Web Design
+*/
+@import '_colors';
+
+input.error {
+	
+}
+
+.spinner-holder {
+	padding: 20px 0px;
+	text-align: center;
+}
+.spinner {
+	display: inline-block;
+	vertical-align: middle;
+	background-color: #ffffff;
+	border-radius: 100%;  
+	-webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
+	animation: sk-scaleout 1.0s infinite ease-in-out;
+}
+.spinner.s60 { width: 60px; height: 60px; }
+.spinner.s40 { width: 40px; height: 40px; }
+.spinner.s20 { width: 17px; height: 17px; }
+
+@-webkit-keyframes sk-scaleout {
+	0% {
+		-webkit-transform: scale(0) 
+	}
+	100% {
+		-webkit-transform: scale(1.0);
+		opacity: 0;
+	}
+}
+
+@keyframes sk-scaleout {
+	0% { 
+		-webkit-transform: scale(0);
+		transform: scale(0);
+	}
+	100% {
+		-webkit-transform: scale(1.0);
+		transform: scale(1.0);
+		opacity: 0;
+	}
+}
+
+button.btn {
+	border-radius: 20px;
+	background-image: none;
+	border: none;
+	box-shadow: 0px 15px 40px 10px rgba(0,0,0,0.3);
+	line-height: 40px;
+	padding: 0px 50px;
+	text-transform: uppercase;
+	text-shadow: none;
+	font-family: Roboto;
+	font-size: 16px;
+	font-weight: 500;
+}
+button.btn:focus {
+	outline: none;
+}
+
+button.btn.btn-white {
+	background-color: $white;
+	color: $blue;
+}
+button.btn.btn-white:hover,
+button.btn.btn-white:active,
+button.btn.btn-white:focus {
+	background-color: $silver;
+	color: $blue;
+}
+
+button.btn.btn-blue {
+	background-color: $blue;
+	color: $white;
+}
+button.btn.btn-blue:hover,
+button.btn.btn-blue:active,
+button.btn.btn-blue:focus {
+	background-color: $blueHover;
+	color: $white;
+}
