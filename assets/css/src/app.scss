@@ -7,10 +7,10 @@
 @import '_splash';
 @import '_auth';
 @import '_helpers';
+@import '_list';
 
 html {
-	background: rgb(75,13,138);
-	background: linear-gradient(7deg, rgba(75,13,138,1) 0%, rgba(15,82,186,1) 100%); 
+	background-color: $white;
 	padding: 0px;
 	margin: 0px;
 	height: 100%;
@@ -31,4 +31,14 @@ html {
 			overflow-y: auto;
 		}
 	}
+}
+* {
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none; /* iOS Safari */
+	  -webkit-user-select: none; /* Safari */
+	   -khtml-user-select: none; /* Konqueror HTML */
+		 -moz-user-select: none; /* Firefox */
+		  -ms-user-select: none; /* Internet Explorer/Edge */
+			  user-select: none; /* Non-prefixed version, currently
+									supported by Chrome and Opera */
 }

@@ -5,6 +5,8 @@ import PageTemplate from './template.js';
 
 var DPRA = function(){
 	
+	this.categories = [];
+	
 	this.signIn = function(){
 		if (!this.validate(['email', 'password'])) return false;
 		
@@ -37,10 +39,43 @@ var DPRA = function(){
 		});
 	};
 	
+	this.renderResults = function(){
+		$('.results').html('<div class="spinner-holder"><div class="spinner s60 blue"></div></div>');
+		
+		xhr({
+			data: {
+				path: 'report/get',
+				fields: '*',
+				filter: 'category_id = ' + $('.categories .item.active').attr('data-id'),
+				order: 'date DESC'
+			},
+			success: function(r){
+				$('.spinner-holder').remove();
+			}.bind(this)
+		});
+	};
+	
+	this.renderCategories = function(){
+		var 
+			html = '',
+			c = null;
+	
+		for (var i = 0; i < this.categories.length; i++)
+		{
+			c = this.categories[i];
+			html += '<div class="item" data-id="' + c.category_id + '">' + c.name + '</div>';
+		}
+		
+		$('.categories').html('<div class="scroller">' + html + '</div>');
+		$('.categories .scroller .item:first-child').trigger('click');
+	};
+	
 	this.renderMissing = function(){
 		this.fadeScreen(function(){
+			$('html').removeClass('bg-gradient');
 			$('#app').html(PageTemplate.missing);
-		});
+			this.renderCategories();
+		}.bind(this));
 	};
 	
 	this.renderSignUp = function(){
@@ -53,6 +88,19 @@ var DPRA = function(){
 		this.fadeScreen(function(){
 			$('#app').html(PageTemplate.signIn);
 		});
+	};
+	
+	this.toggleMenu = function(){
+		if (Math.round($('.menu').position().left) === -245)
+		{
+			$('.menu-overlay').show().animate({opacity: 1}, 300);
+			$('.menu').animate({left: 0}, 300);
+		}
+		else
+		{
+			$('.menu-overlay').hide().css({opacity: 0});
+			$('.menu').animate({left: -245}, 100);
+		}
 	};
 	
 	this.validate = function(form){
@@ -78,36 +126,55 @@ var DPRA = function(){
 	};
 	
 	this.fetchResources = function(){
-		loadStyle('assets/css/bootstrap.css', true);
-		loadStyle('assets/css/fileuploader.css', true);
-		loadStyle('assets/css/font-style.css', true);
+		loadStyle('https://fonts.googleapis.com/css?family=Roboto:300,400,500', function(){
+			document.querySelector('.splash h1').style.display = 'block';
+		}, true);
+		loadStyle('assets/css/bootstrap.css', null, true);
+		loadStyle('assets/css/fileuploader.css', null, true);
+		loadStyle('assets/css/font-style.css', null, true);
 
 		loadScript('assets/js/jquery.min.js', function(){
 			loadScript('assets/js/bootstrap.min.js', function(){
 				loadScript('assets/js/datepicker.min.js', function(){
 					loadScript('assets/js/fileuploader.js', function(){
 						loadScript('assets/js/moment.js', function(){
-							// all resources loaded
-							$('.splash .spinner-holder').remove();
-							
-							var user = window.localStorage.getItem('dpra.user') || null;
-
-							if (!user)
-							{
-								$('.splash').append(
-									'<p><button class="btn btn-white btn-sign-up">sign up</button></p>' +
-									'<p><button class="btn btn-blue btn-sign-in">sign in</button></p>'
-								);
-							}
-							else
-							{
-								App.renderMissing();
-							}
+							xhr({
+								data: {
+									path: 'category/get',
+									fields: 'category_id, name, sort_order',
+									filter: '1 = 1',
+									order: 'sort_order ASC'
+								},
+								success: function(r){
+									App.categories = r.data;
+									App.afterLoaded();
+								}
+							});
 						}, true);
 					}, true);
 				}, true);
 			}, true);
 		}, true);
+	};
+	
+	this.afterLoaded = function(){
+		// all resources are loaded
+		$('.splash .spinner-holder').remove();
+		$('.menu').show();
+
+		var user = window.localStorage.getItem('dpra.user') || null;
+
+		if (!user)
+		{
+			$('.splash').append(
+				'<p><button class="btn btn-white btn-sign-up">sign up</button></p>' +
+				'<p><button class="btn btn-blue btn-sign-in">sign in</button></p>'
+			);
+		}
+		else
+		{
+			this.renderMissing();
+		}
 	};
 	
 	this.init = function(){
@@ -126,6 +193,15 @@ var DPRA = function(){
 };
 
 var App = new DPRA();
+
+$(document).on('click', '.toggle-menu, .menu-overlay', App.toggleMenu);
+
+$(document).on('click', '.categories .scroller .item', function(){
+	$('.categories .item').removeClass('active');
+	$(this).addClass('active');
+	
+	App.renderResults();
+});
 
 $(document).on('click', '.sign-up .btn-sign-up', function(){
 	App.signUp();

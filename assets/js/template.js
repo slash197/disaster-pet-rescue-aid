@@ -22,8 +22,18 @@ var PageTemplate = {
 
 	missing:
 		'<div class="list">' +
-			'list page' +
-		'</div>'
+			'<div class="shadow">' +
+				'<div class="header">' +
+					'<img src="assets/image/menu.png" class="toggle-menu" />Missing' +
+				'</div>' +
+				'<div class="filter">' +
+					'<span class="ico ico-filter-list"></span><span class="seletion">no filters</span>' +
+				'</div>' +
+				'<div class="categories"></div>' +
+			'</div>' +
+			'<div class="results"></div>' +
+		'</div>' +
+		'<div class="create-button-holder"><span class="ico ico-add"></span></div>'
 };
 
 export default PageTemplate;

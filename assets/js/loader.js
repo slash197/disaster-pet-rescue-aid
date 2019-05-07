@@ -16,6 +16,7 @@ function lg(o, level){
 			case 'info':
 			default: console.log(o); break;
 		}
+		//alert(o);
 	}
 };
 
@@ -47,8 +48,9 @@ function loadStyle(source, callback, cache){
 	style.type = 'text/css';
 	style.onerror = function(){
 		lg('loading > error loading file [' + source + ']', 'error');
-		if (typeof callback === 'function') callback();
 	};
+
+	if (typeof callback === 'function') style.onload = callback;
 
 	document.getElementsByTagName('head')[0].appendChild(style);
 };
@@ -58,7 +60,6 @@ window.onerror = function(msg, source, line, col, error){
 	if (error) lg(error, 'error');
 };
 
-loadStyle('https://fonts.googleapis.com/css?family=Roboto:300,400,500', true);
 loadStyle('assets/css/app.css');
 
 loadScript('assets/js/jquery.min.js', function(){
