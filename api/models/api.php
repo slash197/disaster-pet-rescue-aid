@@ -135,11 +135,13 @@ class API
 		if (!isset($this->input->order)) $this->input->order = $this->input->endpoint . '_id ASC';
 		if (!isset($this->input->limit)) $this->input->limit = 100;
 		
-		$res = $this->db->run("SELECT {$this->input->fields} FROM {$this->input->endpoint} WHERE {$this->input->filter} ORDER BY {$this->input->order} LIMIT {$this->input->limit}");
+		$sql = "SELECT {$this->input->fields} FROM {$this->input->endpoint} WHERE {$this->input->filter} ORDER BY {$this->input->order} LIMIT {$this->input->limit}";
+		$res = $this->db->run($sql);
 
 		$this->respond(array(
 			'status'	=>	true,
-			'data'		=>	$res
+			'data'		=>	$res,
+			'sql'		=>	$sql
 		));
 	}
 	

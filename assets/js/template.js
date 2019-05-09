@@ -22,12 +22,12 @@ var PageTemplate = {
 
 	missing:
 		'<div class="list">' +
+			'<div class="header">' +
+				'<img src="assets/image/menu.png" class="toggle-menu" />Missing' +
+			'</div>' +
 			'<div class="shadow">' +
-				'<div class="header">' +
-					'<img src="assets/image/menu.png" class="toggle-menu" />Missing' +
-				'</div>' +
 				'<div class="btn-filter">' +
-					'<span class="ico ico-filter-list"></span><span class="seletion">no filters</span>' +
+					'<span class="ico ico-filter-list"></span><span class="selection">no filters</span>' +
 				'</div>' +
 				'<div class="categories"></div>' +
 			'</div>' +
