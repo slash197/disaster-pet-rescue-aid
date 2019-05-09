@@ -8,6 +8,97 @@
 	</head>
 	<body>
 		<div id="app"></div>
+		
+		<div class="filter" style="display: none">
+			<div class="header">
+				<h1>Filters</h1>
+				<span class="ico ico-check btn-apply"></span>
+			</div>
+			<div class="field">
+				<label>disaster</label>
+				<div class="dropdown" data-tag="disaster">
+					<div class="selection"></div>
+					<span class="ico ico-keyboard-arrow-down"></span>
+					<ul></ul>
+				</div>
+			</div>
+			<div class="field">
+				<label>breed</label>
+				<input type="text" name="breed" />
+			</div>
+			<div class="field" data-tag="color" data-multi="true">
+				<label>color</label>
+				<span class="option selected">any</span>
+			</div>
+			<div class="field" data-tag="gender" data-multi="false">
+				<label>gender</label>
+				<span class="option selected">any</span>
+				<span class="option">male</span>
+				<span class="option">female</span>
+			</div>
+			<div class="field" data-tag="hair" data-multi="false">
+				<label>hair</label>
+				<span class="option selected">any</span>
+				<span class="option">short</span>
+				<span class="option">long</span>
+			</div>
+		</div>
+		
+		<div class="create" style="display: none">
+			<div class="top bg-gradient">
+				<h1></h1>
+			</div>
+			<div class="form">
+				<div class="btn-upload">
+					<input type="file" title="Click to add Files" />
+					<span class="ico ico-photo-camera"></span>
+					<p>tap to upload images</p>
+					<div class="progress"><div class="bar"></div></div>
+				</div>
+				
+				<div class="field" data-tag="files" data-multi="true" style="display: none">
+				</div>
+				<div class="field">
+					<label>name</label>
+					<input type="text" name="name" />
+				</div>
+				<div class="field">
+					<label>breed</label>
+					<input type="text" name="breed" />
+				</div>
+				<div class="field">
+					<label>microchip</label>
+					<input type="text" name="microchip" placeholder="optional" />
+				</div>
+				<div class="field">
+					<label>description</label>
+					<textarea name="description" placeholder="Please provide as much information as possible. Be sure to include specifics as special markings, bobbed tail, extra toes, etc."></textarea>
+				</div>
+				<div class="field" data-tag="color" data-multi="true">
+					<label>color</label>
+				</div>
+				<div class="field" data-tag="gender" data-multi="false">
+					<label>gender</label>
+					<span class="option selected">male</span>
+					<span class="option">female</span>
+				</div>
+				<div class="field" data-tag="hair" data-multi="false">
+					<label>hair</label>
+					<span class="option selected">short</span>
+					<span class="option">long</span>
+				</div>
+				<div class="field" data-tag="altered" data-multi="false">
+					<label>altered/fixed</label>
+					<span class="option">yes</span>
+					<span class="option selected">no</span>
+				</div>
+			</div>
+			<p>
+				<button class="btn btn-cancel btn-white">cancel</button>
+				<button class="btn btn-create btn-blue">submit</button>
+			</p>
+		</div>
+		
 		<div class="menu-overlay"></div>
 		<div class="menu bg-gradient" style="display: none">
 			<div class="header">
@@ -25,6 +116,11 @@
 				<a href="#" data-page=""><span class="ico ico-file-upload"></span>Request Upgrade</a>
 			</div>
 			<div class="footer">© 2019 DPRA <span>v1.0.0</span></div>
+		</div>
+		
+		<div class="notify" style="display: none">
+			<div class="message"></div>
+			<p></p>
 		</div>
 		
 		<script src="assets/js/loader.js"></script>

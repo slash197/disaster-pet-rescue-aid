@@ -26,14 +26,14 @@ var PageTemplate = {
 				'<div class="header">' +
 					'<img src="assets/image/menu.png" class="toggle-menu" />Missing' +
 				'</div>' +
-				'<div class="filter">' +
+				'<div class="btn-filter">' +
 					'<span class="ico ico-filter-list"></span><span class="seletion">no filters</span>' +
 				'</div>' +
 				'<div class="categories"></div>' +
 			'</div>' +
 			'<div class="results"></div>' +
 		'</div>' +
-		'<div class="create-button-holder"><span class="ico ico-add"></span></div>'
+		'<div class="create-button"><span class="ico ico-add"></span></div>'
 };
 
 export default PageTemplate;

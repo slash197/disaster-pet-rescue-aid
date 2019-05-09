@@ -8,6 +8,7 @@
 @import '_auth';
 @import '_helpers';
 @import '_list';
+@import '_create';
 
 html {
 	background-color: $white;
@@ -24,6 +25,8 @@ html {
 		font-size: 14px;
 		font-weight: 400;
 		color: $grey;
+		position: relative;
+		overflow: hidden;
 		
 		#app {
 			height: 100%;
