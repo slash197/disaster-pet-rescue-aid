@@ -1,0 +1,61 @@
+/* 
+    Created on : May 10, 2019, 1:10:43 PM
+    Author     : Slash Web Design
+*/
+
+.map {
+	background-color: $white;
+	height: 100%;
+	
+	.shadow {
+		box-shadow: 0px 20px 30px 20px rgba(0,0,0,0.1);
+	}
+	.header {
+		text-align: center;
+		font-size: 24px;
+		font-weight: 500;
+		line-height: 54px;
+		color: $blue;
+		position: -webkit-sticky;
+		position: sticky;
+		top: 0px;
+		z-index: 2;
+		background-color: $white;
+
+		img {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			cursor: pointer;
+		}
+	}
+	.map-categories {
+		line-height: 45px;
+		height: 48px;
+		overflow-y: hidden;
+		overflow-x: hidden;
+		
+		.scroller {
+			white-space: nowrap;
+			overflow-x: scroll;
+			
+			div {
+				display: inline-block;
+				padding: 0px 40px;
+				margin-bottom: 10px;
+				font-weight: 300;
+				color: $grey;
+				border-bottom: 3px solid $white;
+				text-transform: uppercase;
+				cursor: pointer;
+			}
+			div.active {
+				color: $blue;
+				border-bottom: 3px solid $blue;
+			}
+		}
+	}
+	.results {
+		height: calc(100% - 102px);
+	}
+}

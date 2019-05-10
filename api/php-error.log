@@ -1,0 +1,28 @@
+[10-May-2019 08:48:42 UTC] PHP Notice:  Trying to get property 'lat' of non-object in D:\wamp\www\disaster-pet-rescue-aid\api\models\api.php on line 108
+[10-May-2019 08:48:42 UTC] PHP Stack trace:
+[10-May-2019 08:48:42 UTC] PHP   1. {main}() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:0
+[10-May-2019 08:48:42 UTC] PHP   2. API->create() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:18
+[10-May-2019 08:48:42 UTC] PHP Notice:  Trying to get property 'lng' of non-object in D:\wamp\www\disaster-pet-rescue-aid\api\models\api.php on line 108
+[10-May-2019 08:48:42 UTC] PHP Stack trace:
+[10-May-2019 08:48:42 UTC] PHP   1. {main}() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:0
+[10-May-2019 08:48:42 UTC] PHP   2. API->create() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:18
+[10-May-2019 08:48:42 UTC] PHP Notice:  Undefined property: API::$apiKey in D:\wamp\www\disaster-pet-rescue-aid\api\models\api.php on line 108
+[10-May-2019 08:48:42 UTC] PHP Stack trace:
+[10-May-2019 08:48:42 UTC] PHP   1. {main}() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:0
+[10-May-2019 08:48:42 UTC] PHP   2. API->create() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:18
+[10-May-2019 08:48:42 UTC] PHP Warning:  file_get_contents(https://maps.googleapis.com/maps/api/geocode/json?latlng=,&amp;key=): failed to open stream: HTTP request failed! HTTP/1.0 400 Bad Request
+ in D:\wamp\www\disaster-pet-rescue-aid\api\models\api.php on line 108
+[10-May-2019 08:48:42 UTC] PHP Stack trace:
+[10-May-2019 08:48:42 UTC] PHP   1. {main}() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:0
+[10-May-2019 08:48:42 UTC] PHP   2. API->create() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:18
+[10-May-2019 08:48:42 UTC] PHP   3. file_get_contents() D:\wamp\www\disaster-pet-rescue-aid\api\models\api.php:108
+[10-May-2019 08:48:42 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at D:\wamp\www\disaster-pet-rescue-aid\api\models\api.php:108) in D:\wamp\www\disaster-pet-rescue-aid\api\models\api.php on line 177
+[10-May-2019 08:48:42 UTC] PHP Stack trace:
+[10-May-2019 08:48:42 UTC] PHP   1. {main}() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:0
+[10-May-2019 08:48:42 UTC] PHP   2. API->create() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:18
+[10-May-2019 08:48:42 UTC] PHP   3. API->respond() D:\wamp\www\disaster-pet-rescue-aid\api\models\api.php:109
+[10-May-2019 08:48:42 UTC] PHP   4. header() D:\wamp\www\disaster-pet-rescue-aid\api\models\api.php:177
+[10-May-2019 08:49:33 UTC] PHP Notice:  Undefined property: API::$apiKey in D:\wamp\www\disaster-pet-rescue-aid\api\models\api.php on line 108
+[10-May-2019 08:49:33 UTC] PHP Stack trace:
+[10-May-2019 08:49:33 UTC] PHP   1. {main}() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:0
+[10-May-2019 08:49:33 UTC] PHP   2. API->create() D:\wamp\www\disaster-pet-rescue-aid\api\index.php:18

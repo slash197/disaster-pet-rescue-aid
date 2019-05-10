@@ -1,6 +1,7 @@
 <?php
 /* 
  * Author: Slash Web Design
+ * Google API key AIzaSyBkjxjDdodBTRHjB_6IYoGIXChsouXMYrY
  */
 
 class API
@@ -8,6 +9,7 @@ class API
 	public $db = null;
 	public $input = null;
 	public $auth = null;
+	private $apiKey = 'AIzaSyBkjxjDdodBTRHjB_6IYoGIXChsouXMYrY';
 	
 	function __construct()
 	{
@@ -102,6 +104,20 @@ class API
 			$this->respond(array('status' => false, 'error' => '[1002] Input paramters not defined'));
 		}
 		
+		if ($this->input->endpoint === 'location')
+		{
+			$result = json_decode(file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?latlng={$this->input->data['lat']},{$this->input->data['lng']}&key={$this->apiKey}&location_type=ROOFTOP&result_type=street_address"));
+			
+			if ($result->status === 'OK')
+			{
+				$this->input->data['address'] = $result->results[0]->formatted_address;
+			}
+			else
+			{
+				$this->input->data['address'] = 'Unknown address';
+			}
+		}
+		
 		$this->db->insert($this->input->endpoint, $this->input->data);
 
 		$this->respond(array(
@@ -142,6 +158,22 @@ class API
 			'status'	=>	true,
 			'data'		=>	$res,
 			'sql'		=>	$sql
+		));
+	}
+	
+	public function getMixed()
+	{
+		if (!$this->input->has(array('sql')))
+		{
+			$this->respond(array('status' => false, 'error' => '[1002] Input paramters not defined'));
+		}
+		
+		$res = $this->db->run($this->input->sql);
+
+		$this->respond(array(
+			'status'	=>	true,
+			'data'		=>	$res,
+			'sql'		=>	$this->input->sql
 		));
 	}
 	

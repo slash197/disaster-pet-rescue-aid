@@ -1,7 +1,7 @@
 /*
  * © 2019 SlashWebDesign
  */
-import PageTemplate from './template.js';
+import {PageTemplate, MapStyle} from './template.js';
 
 var DPRA = function(){
 	
@@ -24,6 +24,51 @@ var DPRA = function(){
 		token: null
 	};
 	this.scrollTop = 0;
+	this.position = {
+		status: false,
+		lat: 0.00,
+		lng: 0.00
+	};
+	this.profileSlider = null;
+	this.map = null;
+	this.marker = null;
+	this.markers = [];
+	
+	this.getCurrentPosition = function(callback){
+		navigator.geolocation.getCurrentPosition(
+			function(r){
+				this.position = {
+					status: true,
+					lat: r.coords.latitude,
+					lng: r.coords.longitude
+				};
+				if (typeof callback === 'function') callback();
+			}.bind(this),
+			function(r){
+				lg(r);
+			},
+			{
+				maximumAge: 86400,
+				timeout: 5000,
+				enableHighAccuracy: true
+			}
+		);
+	};
+	
+	this.getPosition = function(){
+		navigator.permissions.query({'name': 'geolocation'}).then(function(q){
+			lg(q);
+			switch (q.state)
+			{
+				case 'prompt':
+					this.getCurrentPosition();
+					break;
+					
+				case 'denied':
+				case 'granted':
+			}
+		}.bind(this));		
+	};
 	
 	this.signIn = function(){
 		if (!this.validate(['email', 'password'])) return false;
@@ -77,7 +122,7 @@ var DPRA = function(){
 				'<div class="name">' + item.name + '</div>' +
 				'<div class="props">' + breed + ', ' + item.color + '</div>' +
 				'<div class="date">Reported on ' + date.format('MMMM D, YYYY') + '</div>' +
-				'<button class="btn btn-small btn-white btn-view">view</button>' +
+				'<button class="btn btn-small btn-white btn-view" data-id="' + e.attr('data-id') + '">view</button>' +
 			'</section>'
 		).insertAfter('.results .item:eq(' + (r * 3 - 1) + ')');
 	};
@@ -123,6 +168,152 @@ var DPRA = function(){
 		if (label === '') label = 'no filters';
 		
 		$('.btn-filter .selection').html(label);
+	};
+	
+	this.getLocation = function(id){		
+		$('.profile .location').html('<div class="spinner-holder"><div class="spinner s60 blue"></div></div>');
+		xhr({
+			data: {
+				path: 'location/get',
+				fields: '*',
+				filter: 'report_id = ' + id,
+				order: 'date DESC'
+			},
+			success: function(r){
+				$('.profile .location').html('');
+						
+				for (var i = 0; i < r.data.length; i++)
+				{
+					var 
+						item = r.data[i],
+						date = moment(parseInt(item.date, 10) * 1000);
+						
+					$('.profile .location').append(
+						'<div class="item">' +
+							'<span class="ico ico-location-on"></span>' +
+							'<div>' +
+								'<p>' + item.address + '</p>' +
+								'<p>' + date.format('HH:mm on MMMM D, YYYY') + '</p>' +
+							'</div>' +
+						'</div>'
+					);
+				}
+			}.bind(this)
+		});
+	};
+	
+	this.onClickMarker = function(){
+		var marker = this;
+		
+		lg(marker.id);
+	};
+	
+	this.renderMap = function(){
+		this.fadeScreen(function(){
+			$('html').removeClass('bg-gradient');
+			$('#app').html(PageTemplate.map);
+			this.renderCategories();
+		}.bind(this));
+	};
+	
+	this.renderLocations = function(){
+		if (!App.position.status)
+		{
+			this.getCurrentPosition(this.renderLocations.bind(this));
+			return false;
+		}
+		
+		$('.results').html('<div class="spinner-holder"><div class="spinner s60 blue"></div></div>');
+		
+		this.category_id = $('.map-categories .item.active').attr('data-id');
+		
+		xhr({
+			data: {
+				path: 'query',
+				sql: 'SELECT l.lat, l.lng, l.date, l.address, r.report_id, r.name, r.files, r.color, r.breed_id, r.hair, r.gender FROM location l, report r WHERE l.report_id = r.report_id AND r.category_id = ' + this.category_id + ' ORDER BY l.date DESC'
+			},
+			success: function(r){
+				$('.spinner-holder').remove();
+				
+				this.map = new google.maps.Map(document.getElementById('map'), {
+					center: {
+						lat: App.position.lat,
+						lng: App.position.lng
+					},
+					zoom: App.position.status ? 15 : 1,
+					zoomControl: false,
+					mapTypeControl: false,
+					scaleControl: false,
+					streetViewControl: false,
+					rotateControl: false,
+					fullscreenControl: false,
+					styles: MapStyle
+				});
+				
+				for (var i = 0; i < r.data.length; i++)
+				{
+					var 
+						item = r.data[i],
+						marker = new google.maps.Marker({
+							position: {
+								lat: parseFloat(item.lat),
+								lng: parseFloat(item.lng)
+							},
+							map: this.map,
+							icon: this.marker.blue,
+							id: item.report_id
+						});
+						
+					marker.addListener('click', this.onClickMarker);
+						
+					this.markers.push(marker);
+				}
+				
+				if (!r.data.length)
+				{
+					$('.results').html('<p class="empty">No results found</p>');
+				}
+			}.bind(this)
+		});
+	};
+	
+	this.renderProfile = function(id){
+		var 
+			images = '',
+			progress = '',
+			item = this.list[id];
+	
+		lg(item);
+		
+		for (var i = 0; i < item.files.length; i++)
+		{
+			images += '<div class="swiper-slide" style="background-image: url(upload/' + item.files[i] + ')"></div>';
+			progress += '<div class="bar" style="width: ' + (100 / item.files.length) + '%"></div>';
+		}
+		
+		$('.swiper-wrapper').html(images);
+		$('.profile .progress').html(progress);
+		$('.profile .name').html(item.name);
+		$('.profile .props .breed span').html(this.getBreed(item.breed_id));
+		$('.profile .props .gender span').html(item.gender);
+		$('.profile .props .color span').html(item.color.replaceAll('|', '<br />'));
+		$('.profile .props .hair span').html(item.hair);
+		$('.profile .description').html(item.description);
+
+		this.getLocation(id);
+		
+		if (this.profileSlider) this.profileSlider.destroy();
+		
+		this.profileSlider = new Swiper ('.swiper-container', {
+			loop: true,
+			autoplay: true,
+			on: {
+				slideChange: function(){
+					$('.profile .progress .bar').removeClass('active');
+					$('.profile .progress .bar:eq(' + this.realIndex + ')').addClass('active');
+				}
+			}
+		});
 	};
 	
 	this.renderResults = function(){
@@ -186,8 +377,8 @@ var DPRA = function(){
 			html += '<div class="item" data-id="' + c.category_id + '">' + c.name + '</div>';
 		}
 		
-		$('.categories').html('<div class="scroller">' + html + '</div>');
-		$('.categories .scroller .item:first-child').trigger('click');
+		$('.map-categories, .categories').html('<div class="scroller">' + html + '</div>');
+		$('.map-categories .scroller .item:first-child, .categories .scroller .item:first-child').trigger('click');
 	};
 	
 	this.renderMissing = function(){
@@ -277,6 +468,17 @@ var DPRA = function(){
 		}
 	};
 	
+	this.toggleProfile = function(){
+		if (Math.round($('.profile').position().top) !== 0)
+		{
+			$('.profile').animate({top: 0}, 300);
+		}
+		else
+		{
+			$('.profile').animate({top: '-100%'}, 100);
+		}
+	};
+	
 	this.toggleFilters = function(){
 		if (Math.round($('.filter').position().top) !== 0)
 		{
@@ -291,8 +493,10 @@ var DPRA = function(){
 	this.toggleForm = function(){
 		if (Math.round($('.create').position().top) !== 0)
 		{
+			this.getPosition();
+			
 			$('.create').scrollTop(0);
-			$('.create h1').html('Create ' + App.page + ' pet report');
+			$('.create h1').html('Create ' + this.page + ' pet report');
 			$('.create input, .create textarea').val('');
 			$('.create [data-tag="files"] span').remove();
 			$('.create').animate({top: 0}, 300);
@@ -403,45 +607,49 @@ var DPRA = function(){
 				loadScript('assets/js/datepicker.min.js', function(){
 					loadScript('assets/js/fileuploader.js', function(){
 						loadScript('assets/js/moment.js', function(){
-							loadScript('assets/js/uploader.js', function(){
-								xhr({
-									data: {
-										path: 'disaster/get',
-										fields: 'disaster_id, name',
-										filter: '1 = 1',
-										order: 'sort_order ASC'
-									},
-									success: function(r){
-										App.disasters = r.data;
-										App.renderDisasters();
-									}
-								});
+							loadScript('assets/js/slider.min.js', function(){
+								loadScript('assets/js/uploader.js', function(){
+									loadScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyBkjxjDdodBTRHjB_6IYoGIXChsouXMYrY', function(){
+										xhr({
+											data: {
+												path: 'disaster/get',
+												fields: 'disaster_id, name',
+												filter: '1 = 1',
+												order: 'sort_order ASC'
+											},
+											success: function(r){
+												App.disasters = r.data;
+												App.renderDisasters();
+											}
+										});
 
-								xhr({
-									data: {
-										path: 'color/get',
-										fields: 'name',
-										filter: '1 = 1',
-										order: 'sort_order ASC'
-									},
-									success: function(r){
-										App.colors = r.data;
-										App.renderColors();
-									}
-								});
+										xhr({
+											data: {
+												path: 'color/get',
+												fields: 'name',
+												filter: '1 = 1',
+												order: 'sort_order ASC'
+											},
+											success: function(r){
+												App.colors = r.data;
+												App.renderColors();
+											}
+										});
 
-								xhr({
-									data: {
-										path: 'category/get',
-										fields: 'category_id, name',
-										filter: '1 = 1',
-										order: 'sort_order ASC'
-									},
-									success: function(r){
-										App.categories = r.data;
-										App.afterLoaded();
-									}
-								});
+										xhr({
+											data: {
+												path: 'category/get',
+												fields: 'category_id, name',
+												filter: '1 = 1',
+												order: 'sort_order ASC'
+											},
+											success: function(r){
+												App.categories = r.data;
+												App.afterLoaded();
+											}
+										});
+										}, true);
+								}, true);
 							}, true);
 						}, true);
 					}, true);
@@ -453,7 +661,7 @@ var DPRA = function(){
 	this.afterLoaded = function(){
 		// all resources are loaded
 		$('.splash .spinner-holder').remove();
-		$('.menu, .create, .notify, .filter').show();
+		$('.menu, .create, .notify, .filter, .profile').show();
 		
 		$('.create .btn-upload').dmUploader({
 			url: 'api/upload',
@@ -486,6 +694,19 @@ var DPRA = function(){
 				App.notify('Invalid file type', 'error');
 			}
 		});
+		
+		this.marker = {
+			grey: {
+				url: 'assets/image/marker-grey.png',
+				size: new google.maps.Size(25, 36),
+				anchor: new google.maps.Point(12, 35)
+			},
+			blue: {
+				url: 'assets/image/marker-blue.png',
+				size: new google.maps.Size(25, 36),
+				anchor: new google.maps.Point(12, 35)
+			}
+		};
 
 		var temp = JSON.parse(window.localStorage.getItem('dpra.user') || null);
 
@@ -499,7 +720,7 @@ var DPRA = function(){
 		else
 		{
 			this.user = temp;
-			this.renderMissing();
+			this.renderMap();
 		}
 	};
 	
@@ -519,6 +740,13 @@ var DPRA = function(){
 };
 
 var App = new DPRA();
+
+$(document).on('click', '.preview .btn-view', function(){
+	App.toggleProfile();
+	App.renderProfile($(this).attr('data-id'));
+});
+
+$(document).on('click', '.profile .ico-keyboard-arrow-left', App.toggleProfile);
 
 $(document).on('click', '.dropdown ul li', function(e){
 	$(this).parent().parent().find('.selection').html($(this).text()).attr('data-id', $(this).attr('data-id'));
@@ -567,7 +795,7 @@ $(document).on('click', '.filter .btn-apply', function(){
 	$('.categories .item[data-id="' + App.category_id + '"]').trigger('click');	
 });
 
-$(document).on('click', '.create-button', App.toggleForm);
+$(document).on('click', '.create-button', App.toggleForm.bind(App));
 
 $(document).on('click', '.create .btn-cancel', App.toggleForm);
 
@@ -599,6 +827,21 @@ $(document).on('click', '.create .btn-create', function(){
 		success: function(r){
 			App.toggleForm();
 			App.notify('Your report has been sent and is pending approval');
+			
+			xhr({
+				data: {
+					path: 'location/create',
+					data: {
+						report_id: r.id,
+						lat: App.position.lat,
+						lng: App.position.lng,
+						date: moment().unix()
+					}
+				},
+				success: function(r){
+					lg(r);
+				}
+			});
 		}
 	});
 });
@@ -646,6 +889,13 @@ $(document).on('click', '.categories .scroller .item', function(){
 	App.renderResults();
 });
 
+$(document).on('click', '.map-categories .scroller .item', function(){
+	$('.map-categories .item').removeClass('active');
+	$(this).addClass('active');
+	
+	App.renderLocations();
+});
+
 $(document).on('click', '.sign-up .btn-sign-up', function(){
 	App.signUp();
 });
@@ -678,6 +928,15 @@ $(document).on('focus', 'input', function(){
 		$(this).removeClass('error');
 		$(this).parent('.input-box').removeClass('error');
 	}
+});
+
+$(document).on('click', '.menu .nav a', function(e){
+	e.preventDefault();
+	
+	App.toggleMenu();
+	
+	var method = $(this).attr('data-page');
+	App[method]();
 });
 
 $('#app').scroll(function(){

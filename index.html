@@ -8,6 +8,28 @@
 	</head>
 	<body>
 		<div id="app"></div>
+
+		<div class="profile" style="display: none">
+			<div class="header">
+				<span class="ico ico-keyboard-arrow-left"></span>
+			</div>
+			<div class="slider">
+				<div class="swiper-container">
+					<div class="swiper-wrapper"></div>
+					<div class="swiper-overlay bg-gradient"></div>
+				</div>
+				<div class="name"></div>
+				<div class="progress"></div>
+			</div>
+			<div class="props">
+				<div class="breed"><label>breed</label><span></span></div>
+				<div class="gender"><label>gender</label><span></span></div>
+				<div class="color"><label>color</label><span></span></div>
+				<div class="hair"><label>hair</label><span></span></div>
+			</div>
+			<div class="description"></div>
+			<div class="location"></div>
+		</div>
 		
 		<div class="filter" style="display: none">
 			<div class="header">
@@ -108,6 +130,10 @@
 					<span class="option">yes</span>
 					<span class="option selected">no</span>
 				</div>
+				<div class="field" data-tag="geolocation" style="display: none">
+					<label>location</label>
+					<input type="text" name="location" placeholder="address" />
+				</div>
 			</div>
 			<p>
 				<button class="btn btn-cancel btn-white">cancel</button>
@@ -123,12 +149,12 @@
 			</div>
 			<div class="nav">
 				<a href="#" data-page=""><span class="ico ico-remove-red-eye"></span>Sighted</a> 
-				<a href="#" data-page=""><span class="ico ico-help"></span>Missing</a>
+				<a href="#" data-page="renderMissing"><span class="ico ico-help"></span>Missing</a>
 				<a href="#" data-page=""><span class="ico ico-check"></span>Found</a>
 				<a href="#" data-page=""><span class="ico ico-link"></span>Reunited</a>
 				<a href="#" data-page=""><span class="ico ico-home"></span>Re-homed</a>
 				<a href="#" data-page=""><span class="ico ico-looks"></span>Rainbow Bridge</a>
-				<a href="#" data-page=""><span class="ico ico-location-on"></span>Map</a>
+				<a href="#" data-page="renderMap"><span class="ico ico-location-on"></span>Map</a>
 				<a href="#" data-page=""><span class="ico ico-file-upload"></span>Request Upgrade</a>
 			</div>
 			<div class="footer">© 2019 DPRA <span>v1.0.0</span></div>
