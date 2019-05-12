@@ -31,6 +31,7 @@ var DPRA = function(){
 	};
 	this.profileSlider = null;
 	this.map = null;
+	this.mapData = [];
 	this.marker = null;
 	this.markers = [];
 	
@@ -55,17 +56,21 @@ var DPRA = function(){
 		);
 	};
 	
-	this.getPosition = function(){
+	this.getPosition = function(callback){
 		navigator.permissions.query({'name': 'geolocation'}).then(function(q){
-			lg(q);
+			//lg('current permission settings');
+			//lg(q);
+			
 			switch (q.state)
 			{
+				case 'granted':
 				case 'prompt':
-					this.getCurrentPosition();
+					this.getCurrentPosition(callback);
 					break;
 					
 				case 'denied':
-				case 'granted':
+					this.notify('Please enable Location services to use this app', 'error');
+					break;					
 			}
 		}.bind(this));		
 	};
@@ -203,9 +208,14 @@ var DPRA = function(){
 	};
 	
 	this.onClickMarker = function(){
-		var marker = this;
+		var 
+			marker = this,
+			item = 
 		
 		lg(marker.id);
+		
+		$('.map-popup .image').css('background-image');
+		$('.map-popup').show();
 	};
 	
 	this.renderMap = function(){
@@ -219,7 +229,7 @@ var DPRA = function(){
 	this.renderLocations = function(){
 		if (!App.position.status)
 		{
-			this.getCurrentPosition(this.renderLocations.bind(this));
+			this.getPosition(this.renderLocations.bind(this));
 			return false;
 		}
 		
@@ -230,11 +240,12 @@ var DPRA = function(){
 		xhr({
 			data: {
 				path: 'query',
-				sql: 'SELECT l.lat, l.lng, l.date, l.address, r.report_id, r.name, r.files, r.color, r.breed_id, r.hair, r.gender FROM location l, report r WHERE l.report_id = r.report_id AND r.category_id = ' + this.category_id + ' ORDER BY l.date DESC'
+				sql: 'SELECT l.location_id, l.lat, l.lng, l.date, l.address, r.report_id, r.name, r.files, r.color, r.breed_id, r.hair, r.gender FROM location l, report r WHERE l.report_id = r.report_id AND r.category_id = ' + this.category_id + ' ORDER BY l.date DESC'
 			},
 			success: function(r){
 				$('.spinner-holder').remove();
 				
+				this.mapData = this.processData(r.data);
 				this.map = new google.maps.Map(document.getElementById('map'), {
 					center: {
 						lat: App.position.lat,
@@ -495,19 +506,37 @@ var DPRA = function(){
 		{
 			this.getPosition();
 			
+			$('.list .header').hide();
 			$('.create').scrollTop(0);
 			$('.create h1').html('Create ' + this.page + ' pet report');
 			$('.create input, .create textarea').val('');
 			$('.create [data-tag="files"] span').remove();
+			$('.btn-upload').css('background-image', 'none');
+			$('.uploads').html('');
 			$('.create').animate({top: 0}, 300);
 		}
 		else
 		{
+			$('.list .header').show();
 			$('.create').animate({top: '-100%'}, 100);
 		}
 	};
 	
 	this.processList = function(data){
+		var out = {};
+		
+		for (var i = 0; i < data.length; i++)
+		{
+			var temp = data[i];
+			
+			out[temp.report_id] = temp;
+			out[temp.report_id]['files'] = temp.files.split('|');
+		}
+		
+		return out;
+	};
+	
+	this.processMapList = function(data){
 		var out = {};
 		
 		for (var i = 0; i < data.length; i++)
@@ -677,6 +706,16 @@ var DPRA = function(){
 				var r = JSON.parse(data);
 				
 				$('.create [data-tag="files"]').append('<span class="option selected">' + r.path + '</span>');
+				
+				if ($('.btn-upload').css('background-image') === 'none')
+				{
+					$('.btn-upload').css({
+						'background-image': 'url(upload/' + r.path + ')',
+						'background-size': 'cover'
+					});
+				}
+				
+				$('.uploads').append('<div data-path="' + r.path + '" style="background-image: url(upload/' + r.path + ')"><span class="ico ico-delete"></span></div>');
 			},
 			onUploadError: function(id, xhr, status, error){
 				$('.btn-upload .progress .bar').css('width', 0 + '%');
@@ -741,6 +780,30 @@ var DPRA = function(){
 
 var App = new DPRA();
 
+$(document).on('click', '.uploads div', function(){
+	var 
+		img = $(this),
+		index = img.index(),
+		path = img.attr('data-path');
+	
+	xhr({
+		data: {
+			path: 'remove-image',
+			url: path
+		},
+		success: function(){
+			img.remove();
+
+			if (index === 0)
+			{
+				$('.btn-upload').css({
+					'background-image': $('.uploads div').length ? 'url(upload/' + $('.uploads div:first-child').attr('data-path') + ')' : 'none'
+				});
+			}
+		}
+	});
+});
+
 $(document).on('click', '.preview .btn-view', function(){
 	App.toggleProfile();
 	App.renderProfile($(this).attr('data-id'));
@@ -801,6 +864,12 @@ $(document).on('click', '.create .btn-cancel', App.toggleForm);
 
 $(document).on('click', '.create .btn-create', function(){
 	if (!App.validate(['files', 'name', 'description', 'color'])) return false;
+	
+	if (!App.position.status)
+	{
+		App.notify('Please enable Location services to upload your report', 'error');
+		return false;
+	}
 
 	xhr({
 		data: {
@@ -820,13 +889,15 @@ $(document).on('click', '.create .btn-create', function(){
 				category_id: App.category_id,
 				disaster_id: App.option2param('disaster', 'create'),
 				breed_id: App.option2param('breed', 'create'),
-				status: 'pending',
+				status: 'approved',
 				type: App.page
 			}
 		},
 		success: function(r){
+			$('.categories .item.active').trigger('click');
+			
 			App.toggleForm();
-			App.notify('Your report has been sent and is pending approval');
+			App.notify('Your report has been sent successfully');
 			
 			xhr({
 				data: {

@@ -48,6 +48,12 @@ class API
 		));
 	}
 	
+	public function removeImage()
+	{
+		@unlink("../upload/{$this->input->url}");
+		$this->respond(array('status'	=>	true));
+	}
+	
 	public function upload()
 	{
 		try {

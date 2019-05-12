@@ -1,6 +1,7 @@
 RewriteEngine on
 
 RewriteRule ^(.*)/(.*)$ index.php?endpoint=$1&method=$2 [NC,QSA]
+RewriteRule ^remove-image$ index.php?method=removeImage [NC,QSA]
 RewriteRule ^query$ index.php?method=getMixed [NC,QSA]
 RewriteRule ^login$ index.php?method=signIn [NC,QSA]
 RewriteRule ^register$ index.php?method=signUp [NC,QSA]
