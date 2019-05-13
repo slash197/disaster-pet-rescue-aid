@@ -46,6 +46,12 @@
 				background-color: transparent;
 				border-radius: 0px;
 			}
+			input:-webkit-autofill,
+			input:-webkit-autofill:hover, 
+			input:-webkit-autofill:focus, 
+			input:-webkit-autofill:active  {
+				color: $white !important;
+			}
 			input:focus,
 			input:active {
 				box-shadow: none;

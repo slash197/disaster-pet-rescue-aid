@@ -276,6 +276,7 @@
 		}
 	}
 }
+
 .create-button {
 	position: absolute;
 	bottom: 20px;
@@ -290,6 +291,7 @@
 		color: $white;
 	}
 }
+
 .filter {
 	position: absolute;
 	top: -100%;
@@ -298,6 +300,7 @@
 	height: 100%;
 	background-color: #f8f7f7;
 	z-index: 3;
+	overflow-y: auto;
 	
 	.header {
 		background-color: $white;

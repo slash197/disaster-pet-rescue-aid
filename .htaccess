@@ -1,6 +1,6 @@
-RewriteEngine On 
-RewriteCond %{SERVER_PORT} 80 
-RewriteRule ^(.*)$ https://www.slashwebdesign.studio/dpra/$1 [R,L]
+#RewriteEngine On 
+#RewriteCond %{SERVER_PORT} 80 
+#RewriteRule ^(.*)$ https://www.slashwebdesign.studio/dpra/$1 [R,L]
 
 <IfModule mod_headers.c>
     # WEEK

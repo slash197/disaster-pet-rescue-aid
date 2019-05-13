@@ -10,7 +10,6 @@ var
 			'assets/js/app.js',
 			'assets/js/bootstrap.min.js',
 			'assets/js/datepicker.min.js',
-			'assets/js/fileuploader.js',
 			'assets/js/jquery.min.js',
 			'assets/js/loader.js',
 			'assets/js/moment.js',
@@ -25,7 +24,7 @@ self.addEventListener('install', function(event){
 		caches
 			.open(appCache.name)
 			.then(function(cache){
-				return cache.addAll(appCache.u);
+				return cache.addAll(appCache.urls);
 			})
 	);
 });
@@ -46,7 +45,7 @@ self.addEventListener('fetch', function(event){
 			            var responseToCache = response.clone();
 
 						caches
-							.open(appCache)
+							.open(appCache.name)
 							.then(function(cache){
 								cache.put(event.request, responseToCache);
 							});

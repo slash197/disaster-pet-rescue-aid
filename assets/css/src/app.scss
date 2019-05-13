@@ -10,6 +10,7 @@
 @import '_list';
 @import '_create';
 @import '_map';
+@import '_reports';
 
 html {
 	background-color: $white;
@@ -22,7 +23,8 @@ html {
 		padding: 0px;
 		margin: 0px;
 		height: 100%;
-		font-family: Roboto;
+		font-family: 'Roboto', sans-serif;
+		font-style: normal;
 		font-size: 14px;
 		font-weight: 400;
 		color: $grey;

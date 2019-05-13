@@ -27,7 +27,7 @@ function loadScript(source, callback, cache, type){
 		tsNow = new Date().getTime(),
 		script = document.createElement('script');
 
-	script.src = !debug ? source : source + '?v=' + tsNow;
+	script.src = (!debug || (source.indexOf('http') > -1)) ? source : source + '?v=' + tsNow;
 	script.async = false;
 	script.defer = false;
 	script.type = type ? type : '';
@@ -37,7 +37,7 @@ function loadScript(source, callback, cache, type){
 	
 	if (typeof callback === 'function') script.onload = callback;
 
-	document.getElementsByTagName('body')[0].appendChild(script);
+	document.body.appendChild(script);
 };
 
 function loadStyle(source, callback, cache){
@@ -66,4 +66,4 @@ loadStyle('assets/css/app.css', null, null);
 
 loadScript('assets/js/jquery.min.js', function(){
 	loadScript('assets/js/app.js', null, null, 'module');
-}, true);
+});

@@ -18,7 +18,7 @@ var DPRA = function(){
 		gender: 'any',
 		hair: 'any'
 	};
-	this.page = 'missing';
+	this.page = '';
 	this.user = {
 		id: null,
 		token: null
@@ -34,6 +34,7 @@ var DPRA = function(){
 	this.mapData = [];
 	this.marker = null;
 	this.markers = [];
+	this.popupEvent = 0;
 	
 	this.getCurrentPosition = function(callback){
 		navigator.geolocation.getCurrentPosition(
@@ -85,13 +86,21 @@ var DPRA = function(){
 				password: $('input[name="password"]').val()
 			},
 			success: function(r){
-				this.user = {
-					id: r.id,
-					token: r.token
-				};
-				this.renderMissing();
-				
-				window.localStorage.setItem('dpra.user', JSON.stringify(this.user));
+				if (r.status)
+				{
+					this.user = {
+						id: r.id,
+						token: r.token
+					};
+
+					window.localStorage.setItem('dpra.user', JSON.stringify(this.user));
+					
+					this.auth();
+				}
+				else
+				{
+					this.notify(r.error, 'error');
+				}
 			}.bind(this)
 		});
 	};
@@ -106,8 +115,14 @@ var DPRA = function(){
 				password: $('input[name="password"]').val()
 			},
 			success: function(r){
-				window.localStorage.setItem('dpra.user', r.token);
-				this.renderMissing();
+				this.user = {
+					id: r.id,
+					token: r.token
+				};
+
+				window.localStorage.setItem('dpra.user', JSON.stringify(this.user));
+				
+				this.auth();
 			}.bind(this)
 		});
 	};
@@ -120,16 +135,25 @@ var DPRA = function(){
 			index = $('.results .item').index(e),
 			date = moment(parseInt(item.date, 10) * 1000),
 			breed = this.getBreed(item.breed_id),
-			r = Math.floor(index / 3) + 1;
+			r = Math.floor(index / 3) + 1,
+			html = '';
 
-		$(
-			'<section class="preview">' +
-				'<div class="name">' + item.name + '</div>' +
-				'<div class="props">' + breed + ', ' + item.color + '</div>' +
-				'<div class="date">Reported on ' + date.format('MMMM D, YYYY') + '</div>' +
-				'<button class="btn btn-small btn-white btn-view" data-id="' + e.attr('data-id') + '">view</button>' +
-			'</section>'
-		).insertAfter('.results .item:eq(' + (r * 3 - 1) + ')');
+		html = 
+				'<section class="preview">' +
+					'<div class="name">' + item.name + '</div>' +
+					'<div class="props">' + breed + ', ' + item.color + '</div>' +
+					'<div class="date">Reported on ' + date.format('MMMM D, YYYY') + '</div>' +
+					'<button class="btn btn-small btn-white btn-view" data-id="' + e.attr('data-id') + '">view</button>' +
+				'</section>';
+		
+		if ($('.results .item:eq(' + (r * 3 - 1) + ')').length)
+		{
+			$(html).insertAfter('.results .item:eq(' + (r * 3 - 1) + ')');
+		}
+		else
+		{
+			$(html).insertAfter('.results .item:last-child');
+		}
 	};
 	
 	this.hidePreview = function(){
@@ -207,11 +231,60 @@ var DPRA = function(){
 		});
 	};
 	
+	this.renderReports = function(){
+		$('.reports .items').html('<div class="spinner-holder"><div class="spinner s60 blue"></div></div>');
+		
+		xhr({
+			data: {
+				path: 'report/get',
+				filter: 'member_id = ' + this.user.id,
+				fields: '*',
+				order: 'date DESC'
+			},
+			success: function(r){
+				this.list = this.processList(r.data);
+				
+				$('.reports .spinner-holder').remove();
+				
+				for (var id in this.list)
+				{
+					var 
+						item = this.list[id],
+						date = moment(parseInt(item.date, 10) * 1000);
+					
+					$('.reports .items').append(
+						'<div class="item" data-id="' + item.report_id + '">' +
+							'<div class="img" style="background-image: url(upload/' + item.files[0] + ')"></div>' +
+							'<div class="data">' +
+								'<p class="status">' + item.type + '</p>' +
+								'<p class="date">' + date.format('HH:mm on MMMM D, YYYY') + '</p>' +
+							'</div>' +
+						'</div>'
+					);
+				}
+				
+				if (!r.data.length)
+				{
+					$('.reports .items').html('<p class="empty">No results found</p>');
+				}
+			}.bind(this)
+		});
+	};
+	
+	this.reports = function(){
+		this.fadeScreen(function(){
+			$('#app').html(PageTemplate.reports);
+			App.renderReports();
+		});
+	};
+	
 	this.onClickMarker = function(){
 		var 
 			marker = this,
 			item = App.mapData[marker.id],
 			date = moment(parseInt(item.date, 10) * 1000);
+		
+		App.popupEvent = moment().unix();
 		
 		$('.map-popup .image').css('background-image', 'url(upload/' + item.files[0] + ')');
 		$('.map-popup .props .breed span').html(App.getBreed(item.breed_id));
@@ -225,13 +298,10 @@ var DPRA = function(){
 
 		$('.map-popup-overlay').show();
 		$('.map-popup').removeClass('shrink').addClass('grow');
-		
-		event.stopPropagation();
 	};
 	
 	this.renderMap = function(){
 		this.fadeScreen(function(){
-			$('html').removeClass('bg-gradient');
 			$('#app').html(PageTemplate.map);
 			this.renderCategories();
 		}.bind(this));
@@ -304,8 +374,6 @@ var DPRA = function(){
 			images = '',
 			progress = '',
 			item = this.list[id];
-	
-		lg(item);
 		
 		for (var i = 0; i < item.files.length; i++)
 		{
@@ -360,7 +428,7 @@ var DPRA = function(){
 			data: {
 				path: 'report/get',
 				fields: 'report_id, name, description, breed_id, disaster_id, color, gender, hair, microchip, altered, files, date',
-				filter: 'status = "approved" AND category_id = ' + this.category_id + this.buildFilterString(),
+				filter: 'type = "' + this.page + '" AND status = "approved" AND category_id = ' + this.category_id + this.buildFilterString(),
 				order: 'date DESC'
 			},
 			success: function(r){
@@ -403,10 +471,26 @@ var DPRA = function(){
 		$('.map-categories .scroller .item:first-child, .categories .scroller .item:first-child').trigger('click');
 	};
 	
-	this.renderMissing = function(){
+	this.renderList = function(type){
+		this.page = type;
+		
 		this.fadeScreen(function(){
-			$('html').removeClass('bg-gradient');
-			$('#app').html(PageTemplate.missing);
+			$('#app').html(PageTemplate.list);
+		
+			$('.list .header .title').html(type.ucFirst());
+			
+			switch (type)
+			{
+				case 'seen':
+				case 'missing':
+				case 'found':
+					$('.create-button').show();
+					break;
+				
+				default:
+					$('.create-button').hide();
+			}
+			
 			this.renderCategories();
 		}.bind(this));
 	};
@@ -639,12 +723,13 @@ var DPRA = function(){
 		loadStyle('assets/css/font-style.css', null, true);
 
 		loadScript('assets/js/jquery.min.js', function(){
+			lg('jquery loaded');
 			loadScript('assets/js/bootstrap.min.js', function(){
 				loadScript('assets/js/datepicker.min.js', function(){
 					loadScript('assets/js/moment.js', function(){
 						loadScript('assets/js/slider.min.js', function(){
 							loadScript('assets/js/uploader.js', function(){
-								loadScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyBkjxjDdodBTRHjB_6IYoGIXChsouXMYrY', function(){
+								loadScript('https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyCpweMS0nZ3odzmeXAkEUjZRqIPBnhVE0o', function(){
 									$('.splash h1').show();
 									
 									xhr({
@@ -685,12 +770,12 @@ var DPRA = function(){
 											App.afterLoaded();
 										}
 									});
-									}, true);
-							}, true);
-						}, true);
-					}, true);
-				}, true);
-			}, true);
+									});
+							});
+						});
+					});
+				});
+			});
 		}, true);
 	};
 	
@@ -753,21 +838,15 @@ var DPRA = function(){
 				anchor: new google.maps.Point(12, 35)
 			}
 		};
-
-		var temp = JSON.parse(window.localStorage.getItem('dpra.user') || null);
-
-		if (!temp)
-		{
-			$('.splash').append(
-				'<p><button class="btn btn-white btn-sign-up">sign up</button></p>' +
-				'<p><button class="btn btn-blue btn-sign-in">sign in</button></p>'
-			);
-		}
-		else
-		{
-			this.user = temp;
-			this.renderMap();
-		}
+		this.auth();
+	};
+	
+	this.logout = function(){
+		window.localStorage.setItem('dpra.user', null);
+		this.fadeScreen(function(){
+			this.splash();
+			this.auth();
+		}.bind(this));
 	};
 	
 	this.init = function(){
@@ -784,16 +863,40 @@ var DPRA = function(){
 				});
 			});
 		}
+		
+		this.splash();
+		this.fetchResources();
+	};
 
+	this.splash = function(){
+		lg('loading splash screen');
 		$('#app').html(
 			'<div class="splash">' +
 				'<div><img src="assets/image/logo.big.white.png" alt="logo" /></div>' +
 				'<h1><span>disaster</span><span>pet rescue</span><span>aid</span></h1>' +
-				'<div class="spinner-holder"><div class="spinner s60 white"></div></div>' +
 			'</div>'
 		);
+	};
+	
+	this.auth = function(){
+		$('.splash h1').show();
 		
-		this.fetchResources();
+		var temp = JSON.parse(window.localStorage.getItem('dpra.user') || null);
+
+		if (!temp)
+		{
+			$('html').addClass('bg-gradient');
+			$('.splash').append(
+				'<p><button class="btn btn-white btn-sign-up">sign up</button></p>' +
+				'<p><button class="btn btn-blue btn-sign-in">sign in</button></p>'
+			);
+		}
+		else
+		{
+			$('html').removeClass('bg-gradient');
+			this.user = temp;
+			this.renderList('missing');
+		}
 	};
 	
 	this.init();
@@ -825,7 +928,7 @@ $(document).on('click', '.uploads div', function(){
 	});
 });
 
-$(document).on('click', '.preview .btn-view', function(){
+$(document).on('click', '.preview .btn-view, .reports .item', function(){
 	App.toggleProfile();
 	App.renderProfile($(this).attr('data-id'));
 });
@@ -845,9 +948,10 @@ $(document).on('click', '.dropdown .selection', function(e){
 $(document).on('click', 'body', function(){
 	$('.dropdown ul').hide();
 	
-	if ($('.map-popup').hasClass('grow'))
+	var diff = moment().unix() - App.popupEvent;
+	
+	if ((diff > 1) && $('.map-popup').hasClass('grow'))
 	{
-		lg('closing map popup');
 		$('.map-popup').removeClass('grow').addClass('shrink');
 		$('.map-popup-overlay').hide();
 	}
@@ -1034,8 +1138,10 @@ $(document).on('click', '.menu .nav a', function(e){
 	
 	App.toggleMenu();
 	
-	var method = $(this).attr('data-page');
-	App[method]();
+	var 
+		method = $(this).attr('data-page'),
+		type = $(this).attr('data-type');
+	App[method](type);
 });
 
 $('#app').scroll(function(){
@@ -1078,4 +1184,14 @@ Math.fmod = function(a, b){
 
 String.prototype.replaceAll = function(find, replace){
 	return this.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+};
+
+String.prototype.ucFirst = function(){
+	var 
+		temp = this.split(''),
+		first = temp[0].toUpperCase();
+
+	delete temp[0];
+	
+	return first + temp.join('');
 };

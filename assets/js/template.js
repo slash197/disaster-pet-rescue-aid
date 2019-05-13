@@ -20,6 +20,16 @@ var PageTemplate = {
 			'<p><a href="#" class="link-sign-up">Sign up</a></p>' +
 		'</div>',
 
+	reports:
+		'<div class="reports">' +
+			'<div class="shadow">' +
+				'<div class="header">' +
+					'<img src="assets/image/menu.png" class="toggle-menu" />My reports' +
+				'</div>' +
+			'</div>' +
+			'<div class="items"></div>' +
+		'</div>',
+
 	map:
 		'<div class="map">' +
 			'<div class="header">' +
@@ -44,10 +54,10 @@ var PageTemplate = {
 			'</div>' +
 		'<div>',
 
-	missing:
+	list:
 		'<div class="list">' +
 			'<div class="header">' +
-				'<img src="assets/image/menu.png" class="toggle-menu" />Missing' +
+				'<img src="assets/image/menu.png" class="toggle-menu" /><span class="title"></span>' +
 			'</div>' +
 			'<div class="shadow">' +
 				'<div class="btn-filter">' +

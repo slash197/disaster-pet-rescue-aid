@@ -9,7 +9,7 @@ class API
 	public $db = null;
 	public $input = null;
 	public $auth = null;
-	private $apiKey = 'AIzaSyBkjxjDdodBTRHjB_6IYoGIXChsouXMYrY';
+	private $apiKey = 'AIzaSyCpweMS0nZ3odzmeXAkEUjZRqIPBnhVE0o';
 	
 	function __construct()
 	{

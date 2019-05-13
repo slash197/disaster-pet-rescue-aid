@@ -134,6 +134,33 @@ input.error {
 	}
 }
 
+input:-internal-autofill-selected,
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active  {
+    box-shadow: none !important;
+	background-color: transparent !important;
+	background-image: none !important;
+    -webkit-animation-name: autofill;
+    -webkit-animation-fill-mode: both;
+	color: $white !important;
+}
+input, input:before, input:after {
+	-webkit-user-select: initial;
+	-khtml-user-select: initial;
+	-moz-user-select: initial;
+	-ms-user-select: initial;
+	user-select: initial;
+}
+	 
+@-webkit-keyframes autofill {
+    to {
+        color: #666;
+        background: transparent;
+    }
+}
+
 .spinner-holder {
 	padding: 20px 0px;
 	text-align: center;
