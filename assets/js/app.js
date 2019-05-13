@@ -210,12 +210,23 @@ var DPRA = function(){
 	this.onClickMarker = function(){
 		var 
 			marker = this,
-			item = 
+			item = App.mapData[marker.id],
+			date = moment(parseInt(item.date, 10) * 1000);
 		
-		lg(marker.id);
+		$('.map-popup .image').css('background-image', 'url(upload/' + item.files[0] + ')');
+		$('.map-popup .props .breed span').html(App.getBreed(item.breed_id));
+		$('.map-popup .props .gender span').html(item.gender);
+		$('.map-popup .props .color span').html(item.color.replaceAll('|', '<br />'));
+		$('.map-popup .props .hair span').html(item.hair);
+		$('.map-popup .location').html(
+			'<p>' + item.address + '</p>' +
+			'<p>' + date.format('HH:mm on MMMM D, YYYY') + '</p>'
+		);
+
+		$('.map-popup-overlay').show();
+		$('.map-popup').removeClass('shrink').addClass('grow');
 		
-		$('.map-popup .image').css('background-image');
-		$('.map-popup').show();
+		event.stopPropagation();
 	};
 	
 	this.renderMap = function(){
@@ -245,7 +256,7 @@ var DPRA = function(){
 			success: function(r){
 				$('.spinner-holder').remove();
 				
-				this.mapData = this.processData(r.data);
+				this.mapData = this.processMapData(r.data);
 				this.map = new google.maps.Map(document.getElementById('map'), {
 					center: {
 						lat: App.position.lat,
@@ -272,7 +283,7 @@ var DPRA = function(){
 							},
 							map: this.map,
 							icon: this.marker.blue,
-							id: item.report_id
+							id: item.location_id
 						});
 						
 					marker.addListener('click', this.onClickMarker);
@@ -363,7 +374,7 @@ var DPRA = function(){
 					
 					$('.results').append(
 						'<div class="item" data-id="' + id + '">' +
-							'<img src="upload/' + item.files[0] + '" />' +
+							'<img src="upload/' + item.files[0] + '" alt="item" />' +
 							'<div class="border"><>/div' +
 						'</div>'
 					);
@@ -536,15 +547,15 @@ var DPRA = function(){
 		return out;
 	};
 	
-	this.processMapList = function(data){
+	this.processMapData = function(data){
 		var out = {};
 		
 		for (var i = 0; i < data.length; i++)
 		{
 			var temp = data[i];
 			
-			out[temp.report_id] = temp;
-			out[temp.report_id]['files'] = temp.files.split('|');
+			out[temp.location_id] = temp;
+			out[temp.location_id]['files'] = temp.files.split('|');
 		}
 		
 		return out;
@@ -624,61 +635,57 @@ var DPRA = function(){
 	};
 	
 	this.fetchResources = function(){
-		loadStyle('https://fonts.googleapis.com/css?family=Roboto:300,400,500', function(){
-			document.querySelector('.splash h1').style.display = 'block';
-		}, true);
 		loadStyle('assets/css/bootstrap.css', null, true);
-		loadStyle('assets/css/fileuploader.css', null, true);
 		loadStyle('assets/css/font-style.css', null, true);
 
 		loadScript('assets/js/jquery.min.js', function(){
 			loadScript('assets/js/bootstrap.min.js', function(){
 				loadScript('assets/js/datepicker.min.js', function(){
-					loadScript('assets/js/fileuploader.js', function(){
-						loadScript('assets/js/moment.js', function(){
-							loadScript('assets/js/slider.min.js', function(){
-								loadScript('assets/js/uploader.js', function(){
-									loadScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyBkjxjDdodBTRHjB_6IYoGIXChsouXMYrY', function(){
-										xhr({
-											data: {
-												path: 'disaster/get',
-												fields: 'disaster_id, name',
-												filter: '1 = 1',
-												order: 'sort_order ASC'
-											},
-											success: function(r){
-												App.disasters = r.data;
-												App.renderDisasters();
-											}
-										});
+					loadScript('assets/js/moment.js', function(){
+						loadScript('assets/js/slider.min.js', function(){
+							loadScript('assets/js/uploader.js', function(){
+								loadScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyBkjxjDdodBTRHjB_6IYoGIXChsouXMYrY', function(){
+									$('.splash h1').show();
+									
+									xhr({
+										data: {
+											path: 'disaster/get',
+											fields: 'disaster_id, name',
+											filter: '1 = 1',
+											order: 'sort_order ASC'
+										},
+										success: function(r){
+											App.disasters = r.data;
+											App.renderDisasters();
+										}
+									});
 
-										xhr({
-											data: {
-												path: 'color/get',
-												fields: 'name',
-												filter: '1 = 1',
-												order: 'sort_order ASC'
-											},
-											success: function(r){
-												App.colors = r.data;
-												App.renderColors();
-											}
-										});
+									xhr({
+										data: {
+											path: 'color/get',
+											fields: 'name',
+											filter: '1 = 1',
+											order: 'sort_order ASC'
+										},
+										success: function(r){
+											App.colors = r.data;
+											App.renderColors();
+										}
+									});
 
-										xhr({
-											data: {
-												path: 'category/get',
-												fields: 'category_id, name',
-												filter: '1 = 1',
-												order: 'sort_order ASC'
-											},
-											success: function(r){
-												App.categories = r.data;
-												App.afterLoaded();
-											}
-										});
-										}, true);
-								}, true);
+									xhr({
+										data: {
+											path: 'category/get',
+											fields: 'category_id, name',
+											filter: '1 = 1',
+											order: 'sort_order ASC'
+										},
+										success: function(r){
+											App.categories = r.data;
+											App.afterLoaded();
+										}
+									});
+									}, true);
 							}, true);
 						}, true);
 					}, true);
@@ -764,9 +771,23 @@ var DPRA = function(){
 	};
 	
 	this.init = function(){
+		if ('serviceWorker' in navigator)
+		{
+			window.addEventListener('load', function(){
+				navigator.serviceWorker.register('sw.js').then(function(registration)
+				{
+					// registration was successful
+					lg('ServiceWorker registration successful with scope: ', registration.scope);
+				}, function(err){
+					// registration failed
+					lg('ServiceWorker registration failed: ', err);
+				});
+			});
+		}
+
 		$('#app').html(
 			'<div class="splash">' +
-				'<div><img src="assets/image/logo.big.white.png" /></div>' +
+				'<div><img src="assets/image/logo.big.white.png" alt="logo" /></div>' +
 				'<h1><span>disaster</span><span>pet rescue</span><span>aid</span></h1>' +
 				'<div class="spinner-holder"><div class="spinner s60 white"></div></div>' +
 			'</div>'
@@ -823,6 +844,13 @@ $(document).on('click', '.dropdown .selection', function(e){
 
 $(document).on('click', 'body', function(){
 	$('.dropdown ul').hide();
+	
+	if ($('.map-popup').hasClass('grow'))
+	{
+		lg('closing map popup');
+		$('.map-popup').removeClass('grow').addClass('shrink');
+		$('.map-popup-overlay').hide();
+	}
 });
 
 $(document).on('click', '.results .item', function(){

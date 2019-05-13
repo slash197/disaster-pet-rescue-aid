@@ -28,16 +28,19 @@ var PageTemplate = {
 			'<div class="shadow">' +
 				'<div class="map-categories"></div>' +
 			'</div>' +
-			'<div id="map" class="results"></div>' +
-			'<div class="map-popup">' + 
-				'<div class="image"></div>' +
-				'<div class="props">' + 
-					'<div class="breed"><label>breed</label><span></span></div>' +
-					'<div class="gender"><label>gender</label><span></span></div>' +
-					'<div class="color"><label>color</label><span></span></div>' +
-					'<div class="hair"><label>hair</label><span></span></div>' +
+			'<div class="map-holder">' +
+				'<div id="map" class="results"></div>' +
+				'<div class="map-popup-overlay"></div>' + 
+				'<div class="map-popup shrink">' + 
+					'<div class="image"></div>' +
+					'<div class="props">' + 
+						'<div class="breed"><label>breed</label><span></span></div>' +
+						'<div class="gender"><label>gender</label><span></span></div>' +
+						'<div class="color"><label>color</label><span></span></div>' +
+						'<div class="hair"><label>hair</label><span></span></div>' +
+					'</div>' +
+					'<div class="location"></div>' +
 				'</div>' +
-				'<div class="location"></div>' +
 			'</div>' +
 		'<div>',
 

@@ -1,13 +1,28 @@
 <!DOCTYPE html>
-<html class="bg-gradient">
+<html class="bg-gradient" lang="en">
 	<head>
 		<title>Disaster Pet Rescue Aid</title>
+		
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="theme-color" content="#0f52ba">
+		
+		<link rel="icon" sizes="192x192" href="assets/image/icon-192.png">
+		<link rel="apple-touch-icon" href="icon-192.png">
+		<meta name="msapplication-square310x310logo" content="icon-192.png">
+		<meta name="Description" content="Disaster Pet Rescue Aid">
+
+		<link rel="manifest" href="manifest.json">
+
 		<link rel="icon" type="image/png" href="assets/image/favicon.png">
+		<link href="assets/css/app.css" rel="preload" as="style" type="text/css">
+		<link href="assets/css/bootstrap.css" rel="preload" as="style" type="text/css">
+		<link href="assets/css/font-style.css" rel="preload" as="style" type="text/css">
 	</head>
 	<body>
 		<div id="app"></div>
+		
+		<noscript><p class="empty">Please enable javasript to use this app</p></noscript>
 
 		<div class="profile" style="display: none">
 			<div class="header">
@@ -76,7 +91,7 @@
 			</div>
 			<div class="form">
 				<div class="btn-upload">
-					<input type="file" title="Click to add Files" />
+					<input type="file" aria-label="Click to add Files" />
 					<span class="ico ico-photo-camera"></span>
 					<p>tap to upload images</p>
 					<div class="progress"><div class="bar"></div></div>
@@ -98,7 +113,7 @@
 				</div>
 				<div class="field">
 					<label>name</label>
-					<input type="text" name="name" />
+					<input type="text" name="name" aria-label="Name" />
 				</div>
 				<div class="field">
 					<label>breed</label>
@@ -110,11 +125,11 @@
 				</div>
 				<div class="field">
 					<label>microchip</label>
-					<input type="text" name="microchip" placeholder="optional" />
+					<input type="text" name="microchip" placeholder="optional" aria-label="Microchip" />
 				</div>
 				<div class="field">
 					<label>description</label>
-					<textarea name="description" placeholder="Please provide as much information as possible. Be sure to include specifics as special markings, bobbed tail, extra toes, etc."></textarea>
+					<textarea name="description" placeholder="Please provide as much information as possible. Be sure to include specifics as special markings, bobbed tail, extra toes, etc."  aria-label="Description"></textarea>
 				</div>
 				<div class="field" data-tag="color" data-multi="true">
 					<label>color</label>
@@ -148,7 +163,7 @@
 		<div class="menu-overlay"></div>
 		<div class="menu bg-gradient" style="display: none">
 			<div class="header">
-				<img src="assets/image/logo.small.white.png" />
+				<img src="assets/image/logo.small.white.png" alt="logo" />
 				<h1><span>disaster</span><span>pet rescue</span><span>aid</span></h1>
 			</div>
 			<div class="nav">

@@ -1,0 +1,21 @@
+{
+	"short_name": "DPRA",
+	"name": "Disaster Pet Rescue Aid",
+	"icons": [
+		{
+			"src": "assets/image/icon-192.png",
+			"type": "image/png",
+			"sizes": "192x192"
+		},
+		{
+			"src": "assets/image/icon-512.png",
+			"type": "image/png",
+			"sizes": "512x512"
+		}
+	],
+	"start_url": "index.html",
+	"background_color": "#0f52ba",
+	"display": "standalone",
+	"scope": "",
+	"theme_color": "#0f52ba"
+}

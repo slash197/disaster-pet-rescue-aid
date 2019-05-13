@@ -2,6 +2,8 @@
  * © 2019 SlashWebDesign
  */
 
+var debug = true;
+
 function lg(o, level){
 	if (!level) level = 'info';
 
@@ -25,7 +27,7 @@ function loadScript(source, callback, cache, type){
 		tsNow = new Date().getTime(),
 		script = document.createElement('script');
 
-	script.src = cache ? source : source + '?v=' + tsNow;
+	script.src = !debug ? source : source + '?v=' + tsNow;
 	script.async = false;
 	script.defer = false;
 	script.type = type ? type : '';
@@ -43,7 +45,7 @@ function loadStyle(source, callback, cache){
 		tsNow = new Date().getTime(),
 		style = document.createElement('link');
 
-	style.href = cache ? source : source + '?v=' + tsNow;
+	style.href = !debug ? source : source + '?v=' + tsNow;
 	style.rel = 'stylesheet';
 	style.type = 'text/css';
 	style.onerror = function(){
@@ -60,7 +62,7 @@ window.onerror = function(msg, source, line, col, error){
 	if (error) lg(error, 'error');
 };
 
-loadStyle('assets/css/app.css');
+loadStyle('assets/css/app.css', null, null);
 
 loadScript('assets/js/jquery.min.js', function(){
 	loadScript('assets/js/app.js', null, null, 'module');
