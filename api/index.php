@@ -4,7 +4,7 @@
  */
 
 ini_set("error_log", "php-error.log");
-ini_set("memory_limit", "64M");
+ini_set("memory_limit", "256M");
 session_start();
 error_reporting(E_ALL);
 

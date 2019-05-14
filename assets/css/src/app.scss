@@ -17,6 +17,8 @@ html {
 	padding: 0px;
 	margin: 0px;
 	height: 100%;
+	-webkit-overflow-scrolling: auto;
+	overflow: hidden;
 	
 	body {
 		background-color: transparent;
@@ -29,11 +31,11 @@ html {
 		font-weight: 400;
 		color: $grey;
 		position: relative;
-		overflow: hidden;
+	-webkit-overflow-scrolling: auto;
 		
 		#app {
 			height: 100%;
-			overflow-x: hidden;
+			overflow: hidden;
 			overflow-y: auto;
 		}
 	}

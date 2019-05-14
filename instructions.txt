@@ -1,0 +1,4 @@
+1. unzip and upload
+2. create database and database user in your server control panel
+3. once the database is created open phpmyadmin and import the database schema, dpra.sql from zip
+4. update api/config.php file from zip with your new database credentials (host, database name, database user and password)

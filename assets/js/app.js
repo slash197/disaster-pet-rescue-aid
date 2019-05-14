@@ -698,7 +698,7 @@ var DPRA = function(){
 	this.option2param = function(tag, selector){
 		var 
 			param = [],
-			field = $('.' + selector + ' .field[data-tag="' + tag + '"');
+			field = $('.' + selector + ' .field[data-tag="' + tag + '"]');
 		
 		field.find('.option.selected').each(function(){
 			param.push($(this).text());
