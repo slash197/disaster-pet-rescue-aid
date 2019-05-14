@@ -47,33 +47,51 @@ var DPRA = function(){
 				if (typeof callback === 'function') callback();
 			}.bind(this),
 			function(r){
-				lg(r);
-			},
+				switch (r.code)
+				{
+					case 1:
+						this.notify('Please enable location services to use this app', 'error');
+						break;
+					case 2:
+						this.notify('Location not available at the moment, try again later', 'error');
+						break;
+					case 3:
+						this.notify('Location service timed out', 'error');
+						break;
+				}
+			}.bind(this),
 			{
 				maximumAge: 86400,
-				timeout: 5000,
+				timeout: 20000,
 				enableHighAccuracy: true
 			}
 		);
 	};
 	
 	this.getPosition = function(callback){
-		navigator.permissions.query({'name': 'geolocation'}).then(function(q){
-			//lg('current permission settings');
-			//lg(q);
-			
-			switch (q.state)
-			{
-				case 'granted':
-				case 'prompt':
-					this.getCurrentPosition(callback);
-					break;
-					
-				case 'denied':
-					this.notify('Please enable Location services to use this app', 'error');
-					break;					
-			}
-		}.bind(this));		
+		if (navigator.permission && navigator.permission.query)
+		{
+			navigator.permissions.query({'name': 'geolocation'}).then(function(q){
+				//lg('current permission settings');
+				//lg(q);
+
+				switch (q.state)
+				{
+					case 'granted':
+					case 'prompt':
+						this.getCurrentPosition(callback);
+						break;
+
+					case 'denied':
+						this.notify('Please enable Location services to use this app', 'error');
+						break;					
+				}
+			}.bind(this));
+		}
+		else
+		{
+			this.getCurrentPosition(callback);
+		}
 	};
 	
 	this.signIn = function(){
@@ -723,7 +741,6 @@ var DPRA = function(){
 		loadStyle('assets/css/font-style.css', null, true);
 
 		loadScript('assets/js/jquery.min.js', function(){
-			lg('jquery loaded');
 			loadScript('assets/js/bootstrap.min.js', function(){
 				loadScript('assets/js/datepicker.min.js', function(){
 					loadScript('assets/js/moment.js', function(){
@@ -853,12 +870,9 @@ var DPRA = function(){
 		if ('serviceWorker' in navigator)
 		{
 			window.addEventListener('load', function(){
-				navigator.serviceWorker.register('sw.js').then(function(registration)
-				{
-					// registration was successful
-					lg('ServiceWorker registration successful with scope: ', registration.scope);
+				navigator.serviceWorker.register('sw.js').then(function(registration){
+					//lg('ServiceWorker registration successful with scope: ', registration.scope);
 				}, function(err){
-					// registration failed
 					lg('ServiceWorker registration failed: ', err);
 				});
 			});
@@ -869,7 +883,6 @@ var DPRA = function(){
 	};
 
 	this.splash = function(){
-		lg('loading splash screen');
 		$('#app').html(
 			'<div class="splash">' +
 				'<div><img src="assets/image/logo.big.white.png" alt="logo" /></div>' +

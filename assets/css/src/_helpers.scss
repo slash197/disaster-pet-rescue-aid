@@ -146,7 +146,8 @@ input:-webkit-autofill:active  {
     -webkit-animation-fill-mode: both;
 	color: $white !important;
 }
-input, input:before, input:after {
+textarea,
+input {
 	-webkit-user-select: initial;
 	-khtml-user-select: initial;
 	-moz-user-select: initial;

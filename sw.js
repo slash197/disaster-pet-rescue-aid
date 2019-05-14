@@ -5,7 +5,6 @@ var
 		urls: [
 			'assets/css/app.css',
 			'assets/css/bootstrap.css',
-			'assets/css/fileuploader.css',
 			'assets/css/font-style.css',
 			'assets/js/app.js',
 			'assets/js/bootstrap.min.js',
@@ -30,29 +29,40 @@ self.addEventListener('install', function(event){
 });
 
 self.addEventListener('fetch', function(event){
-	event.respondWith(
-		caches
-			.match(event.request)
-			.then(function(response){
-				// Cache hit - return response
-				if (response) return response;
+	const requestURL = new URL(event.request.url);
+	
+	if (requestURL.pathname.indexOf('api') > -1)
+	{
+		return false;
+	}
+	else
+	{
+		event.respondWith(
+			caches
+				.match(event.request)
+				.then(function(response){
+					// Cache hit - return response
+					if (response) return response;
 
-				return fetch(event.request).then(
-					function(response){
-						// Check if we received a valid response
-						if (!response || response.status !== 200 || response.type !== 'basic') return response;
+					return fetch(event.request).then(
+						function(response){
+							// Check if we received a valid response
+							if (!response || response.status !== 200 || response.type !== 'basic') return response;
 
-			            var responseToCache = response.clone();
+							var responseToCache = response.clone();
 
-						caches
-							.open(appCache.name)
-							.then(function(cache){
-								cache.put(event.request, responseToCache);
-							});
+							caches
+								.open(appCache.name)
+								.then(function(cache){
+									cache.put(event.request, responseToCache).then(function(a){
+										//console.log(a);
+									});
+								});
 
-						return response;
-					}
-				);
-			})
-    );
+							return response;
+						}
+					);
+				})
+		);
+	}
 });
