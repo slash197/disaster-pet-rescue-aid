@@ -413,8 +413,8 @@ var DPRA = function(){
 		if (this.profileSlider) this.profileSlider.destroy();
 		
 		this.profileSlider = new Swiper ('.swiper-container', {
-			loop: true,
-			autoplay: true,
+			loop: item.files.length > 1,
+			autoplay: item.files.length > 1,
 			on: {
 				slideChange: function(){
 					$('.profile .progress .bar').removeClass('active');
@@ -820,7 +820,8 @@ var DPRA = function(){
 				{
 					$('.btn-upload').css({
 						'background-image': 'url(upload/' + r.path + ')',
-						'background-size': 'cover'
+						'background-size': 'cover',
+						'background-position': 'center center'
 					});
 				}
 				

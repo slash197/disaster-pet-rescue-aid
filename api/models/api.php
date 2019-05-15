@@ -127,7 +127,11 @@ class API
 				throw new RuntimeException('Failed to move uploaded file.');
 			}
 			
-			$this->orientation($file);
+			//$this->orientation($file);
+			$center = new \stojg\crop\CropCenter("../upload/{$file}");
+			
+			$croppedImage = $center->resizeAndCrop(1024, 576);
+			$croppedImage->writeimage("../upload/{$file}");
 
 			echo json_encode([
 				'status'	=> true,

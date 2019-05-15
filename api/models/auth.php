@@ -36,6 +36,12 @@ class Auth
 	
 	public function signUp()
 	{
+		$res = $this->db->run("SELECT member_id FROM member WHERE email = '{$this->input->email}'");
+		if (count($res) > 0)
+		{
+			return array('status' => false, 'error' => '[1005] This email address is already registered');
+		}
+		
 		$this->db->insert("member", array(
 			'email'		=>	$this->input->email,
 			'password'	=>	$this->encrypt($this->input->password),
