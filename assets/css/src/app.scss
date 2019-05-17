@@ -16,22 +16,25 @@ html {
 	background-color: $white;
 	padding: 0px;
 	margin: 0px;
+	width: 100%;
 	height: 100%;
 	-webkit-overflow-scrolling: auto;
 	overflow: hidden;
+	position: fixed;
 	
 	body {
 		background-color: transparent;
 		padding: 0px;
 		margin: 0px;
 		height: 100%;
+		width: 100%;
 		font-family: 'Roboto', sans-serif;
 		font-style: normal;
 		font-size: 14px;
 		font-weight: 400;
 		color: $grey;
-		position: relative;
-	-webkit-overflow-scrolling: auto;
+		position: fixed;
+		-webkit-overflow-scrolling: auto;
 		
 		#app {
 			height: 100%;

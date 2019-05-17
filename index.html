@@ -22,11 +22,11 @@
 		<link href="assets/css/font-style.css" rel="preload" as="style" type="text/css">
 	</head>
 	<body>
-		<div id="app"></div>
+		<div id="app" class="can-scroll"></div>
 		
 		<noscript><p class="empty">Please enable javasript to use this app</p></noscript>
 
-		<div class="profile" style="display: none">
+		<div class="profile can-scroll" style="display: none">
 			<div class="header">
 				<span class="ico ico-keyboard-arrow-left"></span>
 			</div>
@@ -48,7 +48,7 @@
 			<div class="location"></div>
 		</div>
 		
-		<div class="filter" style="display: none">
+		<div class="filter can-scroll" style="display: none">
 			<div class="header">
 				<h1>Filters</h1>
 				<span class="ico ico-check btn-apply"></span>
@@ -87,7 +87,7 @@
 			</div>
 		</div>
 		
-		<div class="create" style="display: none">
+		<div class="create can-scroll" style="display: none">
 			<div class="top bg-gradient">
 				<h1></h1>
 			</div>
@@ -148,8 +148,8 @@
 				</div>
 				<div class="field" data-tag="altered" data-multi="false">
 					<label>altered/fixed</label>
-					<span class="option">yes</span>
 					<span class="option selected">no</span>
+					<span class="option">yes</span>
 				</div>
 				<div class="field" data-tag="geolocation" style="display: none">
 					<label>location</label>
@@ -163,7 +163,7 @@
 		</div>
 		
 		<div class="menu-overlay"></div>
-		<div class="menu bg-gradient" style="display: none">
+		<div class="menu bg-gradient can-scroll" style="display: none">
 			<div class="header">
 				<img src="assets/image/logo.small.white.png" alt="logo" />
 				<h1><span>disaster</span><span>pet rescue</span><span>aid</span></h1>

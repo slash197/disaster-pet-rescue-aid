@@ -24,7 +24,7 @@ class Auth
 				
 				if (($this->input->password === $user['password']) || ($this->decrypt($user['password']) === $this->input->password))
 				{
-					return array('status' => true, 'token' => $this->getToken($user), 'id' => $user['id']);
+					return array('status' => true, 'token' => $this->getToken($user), 'id' => $user['member_id']);
 				}
 				
 				return array('status' => false, 'error' => '[1006] Invalid username or password');
