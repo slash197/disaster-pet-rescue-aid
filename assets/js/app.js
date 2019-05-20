@@ -1181,7 +1181,7 @@ function xhr(o){
 	return $.ajax({
 		url: 'api/' + o.data.path,
 		data: data,
-		type: 'post',
+		type: 'get',
 		dataType: (typeof o.dataType === 'undefined') ? 'json' : o.dataType,
 		success: (typeof o.success === 'undefined') ? function(){} : o.success,
 		error: function(){}
