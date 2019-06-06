@@ -20,11 +20,38 @@ var PageTemplate = {
 			'<p><a href="#" class="link-sign-up">Sign up</a></p>' +
 		'</div>',
 
+	home: 
+		'<div class="home">' +
+			'<div class="header">' +
+				'<span class="ico ico-menu toggle-menu"></span><span class="title">Disaster Pet Rescue</span><img src="assets/image/menu.png" />' +
+			'</div>' +
+			'<div class="content">' +
+				'<h1>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</h1>' +
+				'Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.' +
+			'</div>' +
+			'<div class="action">' +
+				'<button class="btn btn-white btn-donate">Donate</button>' +
+				'<button class="btn btn-blue btn-continue">Continue</button>' +
+			'</div>' +
+		'</div>',
+
+	disasters: 
+		'<div class="home">' +
+			'<div class="header">' +
+				'<span class="ico ico-menu toggle-menu"></span><span class="title">Disaster Pet Rescue</span><img src="assets/image/menu.png" />' +
+			'</div>' +
+			'<h1>Select disaster</h1>' +
+			'<div class="disasters"></div>' +
+			'<div class="action">' +
+				'<button class="btn btn-blue btn-start">View missing</button>' +
+			'</div>' +
+		'</div>',
+
 	reports:
 		'<div class="reports">' +
 			'<div class="shadow">' +
 				'<div class="header">' +
-					'<img src="assets/image/menu.png" class="toggle-menu" />My reports' +
+					'<span class="ico ico-menu toggle-menu"></span><span class="title">My reports</span><img src="assets/image/menu.png" />' +
 				'</div>' +
 			'</div>' +
 			'<div class="items"></div>' +
@@ -33,7 +60,7 @@ var PageTemplate = {
 	map:
 		'<div class="map">' +
 			'<div class="header">' +
-				'<img src="assets/image/menu.png" class="toggle-menu" />Locations' +
+				'<span class="ico ico-menu toggle-menu"></span><span class="title">Locations</span><img src="assets/image/menu.png" />' +
 			'</div>' +
 			'<div class="shadow">' +
 				'<div class="map-categories"></div>' +
@@ -57,11 +84,11 @@ var PageTemplate = {
 	list:
 		'<div class="list">' +
 			'<div class="header">' +
-				'<img src="assets/image/menu.png" class="toggle-menu" /><span class="title"></span>' +
+				'<span class="ico ico-menu toggle-menu"></span><span class="title"></span><img src="assets/image/menu.png" />' +
 			'</div>' +
 			'<div class="shadow">' +
 				'<div class="btn-filter">' +
-					'<span class="ico ico-filter-list"></span><span class="selection">no filters</span>' +
+					'<span class="ico ico-filter-list"></span><span class="selection">Filters</span>' +
 				'</div>' +
 				'<div class="categories"></div>' +
 			'</div>' +

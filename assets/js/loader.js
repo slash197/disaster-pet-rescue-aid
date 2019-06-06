@@ -2,7 +2,7 @@
  * © 2019 SlashWebDesign
  */
 
-var debug = false;
+var debug = true;
 
 function lg(o, level){
 	if (!level) level = 'info';

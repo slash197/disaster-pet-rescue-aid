@@ -35,6 +35,15 @@ var DPRA = function(){
 	this.marker = null;
 	this.markers = [];
 	this.popupEvent = 0;
+	this.pageState = null;
+	
+	this.pushState = function(state){
+		history.pushState(state, 'title', 'index.html');
+		this.pageState = state;
+		
+		//lg('pushed state');
+		//lg(state);
+	};
 	
 	this.getCurrentPosition = function(callback){
 		navigator.geolocation.getCurrentPosition(
@@ -50,7 +59,8 @@ var DPRA = function(){
 				switch (r.code)
 				{
 					case 1:
-						this.notify('Please enable location services to use this app', 'error');
+						this.notify('Please enable location services to use this app [' + r.message + ']', 'error');
+						lg(r);
 						break;
 					case 2:
 						this.notify('Location not available at the moment, try again later', 'error');
@@ -84,6 +94,7 @@ var DPRA = function(){
 
 					case 'denied':
 						this.notify('Please enable Location services to use this app', 'error');
+						lg(q);
 						break;					
 				}
 			}.bind(this));
@@ -212,7 +223,7 @@ var DPRA = function(){
 		if (App.filters.hair !== 'any') label += App.filters.hair + ' hair; ';
 		if (App.filters.gender !== 'any') label += App.filters.gender + ';';
 		
-		if (label === '') label = 'no filters';
+		if (label === '') label = 'Filters';
 		
 		$('.btn-filter .selection').html(label);
 	};
@@ -228,15 +239,15 @@ var DPRA = function(){
 			},
 			success: function(r){
 				$('.profile .location').html('');
-						
+
 				for (var i = 0; i < r.data.length; i++)
 				{
 					var 
 						item = r.data[i],
 						date = moment(parseInt(item.date, 10) * 1000);
-						
+					
 					$('.profile .location').append(
-						'<div class="item">' +
+						'<div class="item" data-lat="' + item.lat + '" data-lng="' + item.lng + '">' +
 							'<span class="ico ico-location-on"></span>' +
 							'<div>' +
 								'<p>' + item.address + '</p>' +
@@ -296,6 +307,27 @@ var DPRA = function(){
 		});
 	};
 	
+	this.renderSelectDisasters = function(){
+		this.fadeScreen(function(){
+			$('#app').html(PageTemplate.disasters);
+			
+			var html = '';
+			for (var i = 0; i < this.disasters.length; i++)
+			{
+				html += '<div class="item" data-id="' + this.disasters[i].disaster_id + '">' + this.disasters[i].name + '</div>';
+			}
+			
+			$('.home .disasters').html(html);
+			$('.home .disasters .item:first-child').trigger('click');
+		}.bind(this));
+	};
+	
+	this.renderHome = function(){
+		this.fadeScreen(function(){
+			$('#app').html(PageTemplate.home);
+		});
+	};
+	
 	this.onClickMarker = function(){
 		var 
 			marker = this,
@@ -318,10 +350,10 @@ var DPRA = function(){
 		$('.map-popup').removeClass('shrink').addClass('grow');
 	};
 	
-	this.renderMap = function(){
+	this.renderMap = function(preselect){
 		this.fadeScreen(function(){
 			$('#app').html(PageTemplate.map);
-			this.renderCategories();
+			this.renderCategories(preselect);
 		}.bind(this));
 	};
 	
@@ -412,7 +444,7 @@ var DPRA = function(){
 		
 		if (this.profileSlider) this.profileSlider.destroy();
 		
-		this.profileSlider = new Swiper ('.swiper-container', {
+		this.profileSlider = new Swiper('.swiper-container', {
 			loop: item.files.length > 1,
 			autoplay: item.files.length > 1,
 			on: {
@@ -474,7 +506,7 @@ var DPRA = function(){
 		});
 	};
 	
-	this.renderCategories = function(){
+	this.renderCategories = function(preselect){
 		var 
 			html = '',
 			c = null;
@@ -486,7 +518,15 @@ var DPRA = function(){
 		}
 		
 		$('.map-categories, .categories').html('<div class="scroller">' + html + '</div>');
-		$('.map-categories .scroller .item:first-child, .categories .scroller .item:first-child').trigger('click');
+		
+		if (preselect)
+		{
+			$('.map-categories .scroller .item[data-id="' + this.category_id + '"], .categories .scroller .item:first-child').trigger('click');
+		}
+		else
+		{
+			$('.map-categories .scroller .item:first-child, .categories .scroller .item:first-child').trigger('click');
+		}
 	};
 	
 	this.renderList = function(type){
@@ -582,6 +622,7 @@ var DPRA = function(){
 		
 		if (Math.round($('.menu').position().left) === -245)
 		{
+			App.pushState({page: 'menu'});
 			$('.menu-overlay').show().animate({opacity: 1}, 300);
 			$('.menu').animate({left: 0}, 300);
 		}
@@ -595,6 +636,7 @@ var DPRA = function(){
 	this.toggleProfile = function(){
 		if (Math.round($('.profile').position().top) !== 0)
 		{
+			App.pushState({page: 'profile'});
 			$('.profile').animate({top: 0}, 300);
 		}
 		else
@@ -606,6 +648,7 @@ var DPRA = function(){
 	this.toggleFilters = function(){
 		if (Math.round($('.filter').position().top) !== 0)
 		{
+			App.pushState({page: 'filter'});
 			$('.filter').animate({top: 0}, 300);
 		}
 		else
@@ -617,6 +660,7 @@ var DPRA = function(){
 	this.toggleForm = function(){
 		if (Math.round($('.create').position().top) !== 0)
 		{
+			App.pushState({page: 'create'});
 			this.getPosition();
 			
 			$('.list .header').hide();
@@ -629,7 +673,7 @@ var DPRA = function(){
 			$('.create').animate({top: 0}, 300);
 		}
 		else
-		{
+		{			
 			$('.list .header').show();
 			$('.create').animate({top: '-100%'}, 100);
 		}
@@ -870,15 +914,16 @@ var DPRA = function(){
 	this.init = function(){
 		if ('serviceWorker' in navigator)
 		{
-			window.addEventListener('load', function(){
-				navigator.serviceWorker.register('sw.js').then(function(registration){
+			//window.addEventListener('load', function(){
+			//	navigator.serviceWorker.register('sw.js').then(function(registration){
 					//lg('ServiceWorker registration successful with scope: ', registration.scope);
-				}, function(err){
-					lg('ServiceWorker registration failed: ', err);
-				});
-			});
+			//	}, function(err){
+			//		lg('ServiceWorker registration failed: ', err);
+			//	});
+			//});
 		}
 		
+		this.pushState({page: 'list'});
 		this.splash();
 		this.fetchResources();
 	};
@@ -909,7 +954,7 @@ var DPRA = function(){
 		{
 			$('html').removeClass('bg-gradient');
 			this.user = temp;
-			this.renderList('missing');
+			this.renderHome();
 		}
 	};
 	
@@ -917,6 +962,46 @@ var DPRA = function(){
 };
 
 var App = new DPRA();
+
+window.addEventListener('popstate', function(event){
+	return false;
+	//lg('pop state');
+	//lg(App.pageState);
+
+	//if (event.state === null) return false;
+	
+	switch (App.pageState.page)
+	{
+		case 'create':
+			App.toggleForm();
+			break;
+		case 'filter':
+			App.toggleFilters();
+			break;
+		case 'profile':
+			App.toggleProfile();
+			break;
+		case 'menu':
+			App.toggleMenu();
+			break;
+	}
+	
+	App.pageState = event.state;
+});
+
+$(document).on('click', '.home .disasters .item', function(){
+	$('.home .disasters .item .ico-check').remove();
+	$(this).prepend('<span class="ico ico-check"></span>');
+});
+
+$(document).on('click', '.home .btn-start', function(){
+	App.filters.disaster_id = $('.home .disasters .item .ico-check').parent().attr('data-id');
+	App.renderList('missing');
+});
+
+$(document).on('click', '.home .btn-continue', function(){
+	App.renderSelectDisasters();
+});
 
 $(document).on('click', '.uploads div', function(){
 	var 
@@ -945,6 +1030,15 @@ $(document).on('click', '.uploads div', function(){
 $(document).on('click', '.preview .btn-view, .reports .item', function(){
 	App.toggleProfile();
 	App.renderProfile($(this).attr('data-id'));
+});
+
+$(document).on('click', '.profile .location .item', function(){
+	App.toggleProfile();
+	App.renderMap(true);
+	
+	window.setTimeout(function(){
+		if (App.map) App.map.setCenter({lat: parseFloat($(this).attr('data-lat')), lng: parseFloat($(this).attr('data-lng'))});
+	}, 2000);
 });
 
 $(document).on('click', '.profile .ico-keyboard-arrow-left', App.toggleProfile);
@@ -992,7 +1086,7 @@ $(document).on('click', '.filter .btn-apply', function(){
 	App.toggleFilters();
 	
 	App.filters = {
-		disaster_id: App.option2param('disaster', 'filter'),
+		disaster_id: App.filters.disaster_id,
 		breed_id: App.option2param('breed', 'filter'),
 		color: App.option2param('color', 'filter'),
 		gender: App.option2param('gender', 'filter'),
