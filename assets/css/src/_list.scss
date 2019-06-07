@@ -211,6 +211,7 @@
 		height: 48px;
 		overflow-y: hidden;
 		overflow-x: hidden;
+		position: relative;
 		
 		.scroller {
 			white-space: nowrap;
@@ -230,6 +231,20 @@
 				color: $blue;
 				border-bottom: 3px solid $blue;
 			}
+		}
+		.ico {
+			position: absolute;
+			top: 50%;
+			display: none;
+			font-size: 32px;
+			color: #cccccc;
+			margin-top: -16px;
+		}
+		.ico-keyboard-arrow-left {
+			left: 0px;
+		}
+		.ico-keyboard-arrow-right {
+			right: 0px;
 		}
 	}
 	.results {

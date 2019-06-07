@@ -14,9 +14,12 @@ var DPRA = function(){
 	this.filters = {
 		disaster_id: '0',
 		breed_id: '0',
-		color: 'any',
+		color_primary: 'any',
+		color_secondary: 'any',
 		gender: 'any',
-		hair: 'any'
+		hair: 'any',
+		patterns: 'solid',
+		altered: 'no'
 	};
 	this.page = '';
 	this.user = {
@@ -36,6 +39,7 @@ var DPRA = function(){
 	this.markers = [];
 	this.popupEvent = 0;
 	this.pageState = null;
+	this.categoryItemWidth = 0;
 	
 	this.pushState = function(state){
 		history.pushState(state, 'title', 'index.html');
@@ -189,15 +193,15 @@ var DPRA = function(){
 		$('.results .preview').remove();
 	};
 	
-	this.buildColorFilterString = function(){
+	this.buildColorFilterString = function(type){
 		var 
 			str = '',
-			temp = App.filters.color.split('|');
+			temp = App.filters[type].split('|');
 		
 		for (var i = 0; i < temp.length; i++)
 		{
 			if (i !== 0) str += ' OR ';
-			str += 'color LIKE "%' + temp[i] + '%"';
+			str += type + ' LIKE "%' + temp[i] + '%"';
 		}
 		
 		return str;
@@ -208,9 +212,12 @@ var DPRA = function(){
 		
 		if (App.filters.disaster_id !== '0') str += ' AND disaster_id = ' + App.filters.disaster_id;
 		if (App.filters.breed_id !== '0') str += ' AND breed_id = ' + App.filters.breed_id;
-		if (App.filters.color !== 'any') str += ' AND (' + App.buildColorFilterString() + ')';
+		if (App.filters.color_primary !== 'any') str += ' AND (' + App.buildColorFilterString('color_primary') + ')';
+		if (App.filters.color_secondary !== 'any') str += ' AND (' + App.buildColorFilterString('color_secondary') + ')';
 		if (App.filters.gender !== 'any') str += ' AND gender = "' + App.filters.gender + '"';
 		if (App.filters.hair !== 'any') str += ' AND hair = "' + App.filters.hair + '"';
+		if (App.filters.altered !== 'unknown') str += ' AND altered = "' + App.filters.altered + '"';
+		str += ' AND patterns = "' + App.filters.patterns + '"';
 		
 		return str;
 	};
@@ -219,9 +226,11 @@ var DPRA = function(){
 		var label = '';
 		
 		if (App.filters.breed_id !== '0') label += this.getBreed(App.filters.breed_id) + '; ';
-		if (App.filters.color !== 'any') label += App.filters.color.replaceAll('|', ', ') + ' color; ';
+		if (App.filters.color_primary !== 'any') label += App.filters.color_primary.replaceAll('|', ', ') + ' color; ';
 		if (App.filters.hair !== 'any') label += App.filters.hair + ' hair; ';
 		if (App.filters.gender !== 'any') label += App.filters.gender + ';';
+		if (App.filters.altered !== 'unknown') label += App.filters.altered + ';';
+		label += App.filters.patterns + ';';
 		
 		if (label === '') label = 'Filters';
 		
@@ -310,16 +319,25 @@ var DPRA = function(){
 	this.renderSelectDisasters = function(){
 		this.fadeScreen(function(){
 			$('#app').html(PageTemplate.disasters);
-			
-			var html = '';
-			for (var i = 0; i < this.disasters.length; i++)
-			{
-				html += '<div class="item" data-id="' + this.disasters[i].disaster_id + '">' + this.disasters[i].name + '</div>';
-			}
-			
-			$('.home .disasters').html(html);
-			$('.home .disasters .item:first-child').trigger('click');
+			$('.tab div:first').trigger('click');
 		}.bind(this));
+	};
+	
+	this.renderDisasterType = function(type){
+		var 
+			check = '',
+			html = '';
+
+		for (var i = 0; i < this.disasters.length; i++)
+		{
+			if (this.disasters[i].type === type)
+			{
+				check = (App.filters.disaster_id === this.disasters[i].disaster_id) ? '<span class="ico ico-check"></span>' : '';
+				html += '<div class="item" data-id="' + this.disasters[i].disaster_id + '" style="background-image: url(assets/image/disaster.jpg)"><div>' + check + this.disasters[i].name + ' (23)</div></div>';
+			}
+		}
+
+		$('.home .disasters').html(html);
 	};
 	
 	this.renderHome = function(){
@@ -477,7 +495,7 @@ var DPRA = function(){
 		xhr({
 			data: {
 				path: 'report/get',
-				fields: 'report_id, name, description, breed_id, disaster_id, color, gender, hair, microchip, altered, files, date',
+				fields: 'report_id, name, description, breed_id, disaster_id, color_primary, color_secondary, patterns, gender, hair, microchip, altered, files, date',
 				filter: 'type = "' + this.page + '" AND status = "approved" AND category_id = ' + this.category_id + this.buildFilterString(),
 				order: 'date DESC'
 			},
@@ -517,7 +535,7 @@ var DPRA = function(){
 			html += '<div class="item" data-id="' + c.category_id + '">' + c.name + '</div>';
 		}
 		
-		$('.map-categories, .categories').html('<div class="scroller">' + html + '</div>');
+		$('.map-categories, .categories').html('<div class="scroller">' + html + '<span class="ico ico-keyboard-arrow-left"></span><span class="ico ico-keyboard-arrow-right"></span></div>');
 		
 		if (preselect)
 		{
@@ -527,6 +545,46 @@ var DPRA = function(){
 		{
 			$('.map-categories .scroller .item:first-child, .categories .scroller .item:first-child').trigger('click');
 		}
+		
+		this.categoryItemWidth = 0;
+		$('.scroller .item').each(function(){
+			App.categoryItemWidth += $(this).outerWidth(true);
+		});
+
+		$('.scroller').scroll(function(){
+			App.renderCategoryListControls();
+		});
+		
+		this.renderCategoryListControls();
+	};
+	
+	this.renderCategoryListControls = function(){
+		var 
+			max = this.categoryItemWidth - $('.categories').width() - 1,
+			pos = $('.categories .scroller').get(0).scrollLeft;
+		
+		if (pos < 1)
+		{
+			$('.categories .ico-keyboard-arrow-left').hide();
+		}
+			
+		if (pos > 1) 
+		{
+			$('.categories .ico-keyboard-arrow-left').show();
+		}
+		
+		if (pos > max)
+		{
+			$('.categories .ico-keyboard-arrow-right').hide();
+		}
+		
+		if (pos < max)
+		{
+			$('.categories .ico-keyboard-arrow-right').show();			
+		}
+		
+		lg(max);
+		lg(pos);
 	};
 	
 	this.renderList = function(type){
@@ -573,7 +631,7 @@ var DPRA = function(){
 			html += '<span class="option">' + this.colors[i].name + '</span>';
 		}
 		
-		$('[data-tag="color"]').append(html);
+		$('[data-tag="color_primary"], [data-tag="color_secondary"]').append(html);
 	};
 	
 	this.renderDisasters = function(){
@@ -796,7 +854,7 @@ var DPRA = function(){
 									xhr({
 										data: {
 											path: 'disaster/get',
-											fields: 'disaster_id, name',
+											fields: 'disaster_id, name, type',
 											filter: '1 = 1',
 											order: 'sort_order ASC'
 										},
@@ -989,13 +1047,17 @@ window.addEventListener('popstate', function(event){
 	App.pageState = event.state;
 });
 
+$(document).on('click', '.home .tab div', function(){
+	$('.home .tab div').removeClass('active');
+	$(this).addClass('active');
+	App.renderDisasterType($(this).attr('data-type'));
+});
+
 $(document).on('click', '.home .disasters .item', function(){
 	$('.home .disasters .item .ico-check').remove();
 	$(this).prepend('<span class="ico ico-check"></span>');
-});
-
-$(document).on('click', '.home .btn-start', function(){
-	App.filters.disaster_id = $('.home .disasters .item .ico-check').parent().attr('data-id');
+	
+	App.filters.disaster_id = $(this).attr('data-id');
 	App.renderList('missing');
 });
 
@@ -1088,9 +1150,12 @@ $(document).on('click', '.filter .btn-apply', function(){
 	App.filters = {
 		disaster_id: App.filters.disaster_id,
 		breed_id: App.option2param('breed', 'filter'),
-		color: App.option2param('color', 'filter'),
+		color_primary: App.option2param('color_primary', 'filter'),
+		color_secondary: App.option2param('color_secondary', 'filter'),
 		gender: App.option2param('gender', 'filter'),
-		hair: App.option2param('hair', 'filter')
+		hair: App.option2param('hair', 'filter'),
+		patterns: App.option2param('patterns', 'filter'),
+		altered: App.option2param('altered', 'filter')
 	};
 	
 	App.updateFilterLabel();
@@ -1117,13 +1182,15 @@ $(document).on('click', '.create .btn-create', function(){
 			data: {
 				name: $('[name="name"]').val(),
 				breed: $('[name="breed"]').val(),
-				color: App.option2param('color', 'create'),
+				color_primary: App.option2param('color_primary', 'create'),
+				color_secondary: App.option2param('color_secondary', 'create'),
 				files: App.option2param('files', 'create'),
 				description: $('[name="description"]').val(),
 				microchip: $('[name="microchip"]').val(),
 				hair: App.option2param('hair', 'create'),
 				gender: App.option2param('gender', 'create'),
 				altered: App.option2param('altered', 'create'),
+				patterns: App.option2param('patterns', 'create'),
 				date: moment().unix(),
 				member_id: App.user.id,
 				category_id: App.category_id,

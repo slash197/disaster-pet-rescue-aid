@@ -71,9 +71,19 @@
 					<ul></ul>
 				</div>
 			</div>
-			<div class="field" data-tag="color" data-multi="true">
-				<label>color</label>
+			<div class="field" data-tag="color_primary" data-multi="true">
+				<label>primary color</label>
 				<span class="option selected">any</span>
+			</div>
+			<div class="field" data-tag="color_secondary" data-multi="true">
+				<label>secondary color</label>
+				<span class="option selected">any</span>
+			</div>
+			<div class="field" data-tag="patterns" data-multi="false">
+				<label>pattern</label>
+				<span class="option selected">solid</span>
+				<span class="option">stripes</span>
+				<span class="option">spots</span>
 			</div>
 			<div class="field" data-tag="gender" data-multi="false">
 				<label>gender</label>
@@ -86,6 +96,13 @@
 				<span class="option selected">any</span>
 				<span class="option">short</span>
 				<span class="option">long</span>
+				<span class="option">hairless</span>
+			</div>
+			<div class="field" data-tag="altered" data-multi="false">
+				<label>altered</label>
+				<span class="option selected">unknown</span>
+				<span class="option">no</span>
+				<span class="option">yes</span>
 			</div>
 		</div>
 		
@@ -135,8 +152,17 @@
 					<label>description</label>
 					<textarea name="description" placeholder="Please provide as much information as possible. Be sure to include specifics as special markings, bobbed tail, extra toes, etc."  aria-label="Description"></textarea>
 				</div>
-				<div class="field" data-tag="color" data-multi="true">
-					<label>color</label>
+				<div class="field" data-tag="color_primary" data-multi="true">
+					<label>primary color</label>
+				</div>
+				<div class="field" data-tag="color_secondary" data-multi="true">
+					<label>secondary color</label>
+				</div>
+				<div class="field" data-tag="patterns" data-multi="false">
+					<label>pattern</label>
+					<span class="option selected">solid</span>
+					<span class="option">stripes</span>
+					<span class="option">spots</span>
 				</div>
 				<div class="field" data-tag="gender" data-multi="false">
 					<label>gender</label>
@@ -147,11 +173,13 @@
 					<label>hair</label>
 					<span class="option selected">short</span>
 					<span class="option">long</span>
+					<span class="option">hairless</span>
 				</div>
 				<div class="field" data-tag="altered" data-multi="false">
 					<label>altered/fixed</label>
 					<span class="option selected">no</span>
 					<span class="option">yes</span>
+					<span class="option">unknown</span>
 				</div>
 				<div class="field" data-tag="geolocation" style="display: none">
 					<label>location</label>
@@ -171,6 +199,7 @@
 				<h1><span>disaster</span><span>pet rescue</span><span>aid</span></h1>
 			</div>
 			<div class="nav">
+				<a href="#" data-page="renderHome"><span class="ico ico-home"></span>Home</a> 
 				<a href="#" data-page="renderList" data-type="seen"><span class="ico ico-remove-red-eye"></span>Seen</a> 
 				<a href="#" data-page="renderList" data-type="missing"><span class="ico ico-help"></span>Missing</a>
 				<a href="#" data-page="renderList" data-type="found"><span class="ico ico-check"></span>Found</a>
