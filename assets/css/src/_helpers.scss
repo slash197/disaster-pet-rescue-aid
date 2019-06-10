@@ -16,7 +16,7 @@ input.error {
 }
 
 .bg-gradient {
-	background: linear-gradient(7deg, rgba(75,13,138,1) 0%, rgba(15,82,186,1) 100%); 
+	background: linear-gradient(7deg, rgba(75,13,138,1) 0%, rgba(15,82,186,1) 100%);
 }
 
 .shrink {
@@ -200,6 +200,7 @@ input {
 	}
 }
 
+a.btn,
 button.btn {
 	border-radius: 20px;
 	background-image: none;
@@ -213,14 +214,19 @@ button.btn {
 	font-size: 16px;
 	font-weight: 500;
 }
+a.btn,
 button.btn:focus {
 	outline: none;
 }
 
+a.btn.btn-white,
 button.btn.btn-white {
 	background-color: $white;
 	color: $blue;
 }
+a.btn.btn-white:hover,
+a.btn.btn-white:active,
+a.btn.btn-white:focus,
 button.btn.btn-white:hover,
 button.btn.btn-white:active,
 button.btn.btn-white:focus {
@@ -228,21 +234,34 @@ button.btn.btn-white:focus {
 	color: $blue;
 }
 
+a.btn.btn-blue,
 button.btn.btn-blue {
 	background-color: $blue;
 	color: $white;
 }
+a.btn.btn-blue:hover,
+a.btn.btn-blue:active,
+a.btn.btn-blue:focus,
 button.btn.btn-blue:hover,
 button.btn.btn-blue:active,
 button.btn.btn-blue:focus {
 	background-color: $blueHover;
 	color: $white;
 }
+a.btn.btn-small,
 button.btn.btn-small {
 	font-size: 14px;
 	line-height: 28px;
 	padding: 0px 30px;
 	border-radius: 15px;
+}
+
+a,
+a:hover,
+a:focus,
+a:active {
+	outline: none;
+	text-decoration: none;
 }
  
 /* slider styles */

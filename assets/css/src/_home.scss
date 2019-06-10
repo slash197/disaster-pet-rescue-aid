@@ -73,6 +73,7 @@
 		
 		.btn {
 			display: block;
+			width: 150px;
 			margin: 0px auto 30px auto;
 		}
 	}
@@ -83,9 +84,13 @@
 		line-height: 20px;
 		text-align: center;
 	}
+	.hero {
+		text-align: center;
+	}
 	.disasters {
 		
-		.item {
+		a.item {
+			display: block;
 			cursor: pointer;
 			position: relative;
 			background-size: cover;

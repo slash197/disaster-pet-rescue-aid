@@ -41,14 +41,6 @@ var DPRA = function(){
 	this.pageState = null;
 	this.categoryItemWidth = 0;
 	
-	this.pushState = function(state){
-		history.pushState(state, 'title', 'index.html');
-		this.pageState = state;
-		
-		//lg('pushed state');
-		//lg(state);
-	};
-	
 	this.getCurrentPosition = function(callback){
 		navigator.geolocation.getCurrentPosition(
 			function(r){
@@ -174,7 +166,7 @@ var DPRA = function(){
 		html = 
 				'<section class="preview">' +
 					'<div class="name">' + item.name + '</div>' +
-					'<div class="props">' + breed + ', ' + item.color + '</div>' +
+					'<div class="props">' + breed + ', ' + item.color_primary + '</div>' +
 					'<div class="date">Reported on ' + date.format('MMMM D, YYYY') + '</div>' +
 					'<button class="btn btn-small btn-white btn-view" data-id="' + e.attr('data-id') + '">view</button>' +
 				'</section>';
@@ -256,13 +248,13 @@ var DPRA = function(){
 						date = moment(parseInt(item.date, 10) * 1000);
 					
 					$('.profile .location').append(
-						'<div class="item" data-lat="' + item.lat + '" data-lng="' + item.lng + '">' +
+						'<a href="quick-map" class="item" data-lat="' + item.lat + '" data-lng="' + item.lng + '">' +
 							'<span class="ico ico-location-on"></span>' +
 							'<div>' +
 								'<p>' + item.address + '</p>' +
 								'<p>' + date.format('HH:mm on MMMM D, YYYY') + '</p>' +
 							'</div>' +
-						'</div>'
+						'</a>'
 					);
 				}
 			}.bind(this)
@@ -333,7 +325,7 @@ var DPRA = function(){
 			if (this.disasters[i].type === type)
 			{
 				check = (App.filters.disaster_id === this.disasters[i].disaster_id) ? '<span class="ico ico-check"></span>' : '';
-				html += '<div class="item" data-id="' + this.disasters[i].disaster_id + '" style="background-image: url(assets/image/disaster.jpg)"><div>' + check + this.disasters[i].name + ' (23)</div></div>';
+				html += '<a href="list-missing" class="item" data-id="' + this.disasters[i].disaster_id + '" style="background-image: url(assets/image/disaster.jpg)"><div>' + check + this.disasters[i].name + ' (' + this.disasters[i].total + ')</div></a>';
 			}
 		}
 
@@ -389,7 +381,7 @@ var DPRA = function(){
 		xhr({
 			data: {
 				path: 'query',
-				sql: 'SELECT l.location_id, l.lat, l.lng, l.date, l.address, r.report_id, r.name, r.files, r.color, r.breed_id, r.hair, r.gender FROM location l, report r WHERE l.report_id = r.report_id AND r.category_id = ' + this.category_id + ' ORDER BY l.date DESC'
+				sql: 'SELECT l.location_id, l.lat, l.lng, l.date, l.address, r.report_id, r.name, r.files, r.color_primary, r.breed_id, r.hair, r.gender FROM location l, report r WHERE l.report_id = r.report_id AND r.category_id = ' + this.category_id + ' ORDER BY l.date DESC'
 			},
 			success: function(r){
 				$('.spinner-holder').remove();
@@ -454,7 +446,7 @@ var DPRA = function(){
 		$('.profile .name').html(item.name);
 		$('.profile .props .breed span').html(this.getBreed(item.breed_id));
 		$('.profile .props .gender span').html(item.gender);
-		$('.profile .props .color span').html(item.color.replaceAll('|', '<br />'));
+		$('.profile .props .color span').html(item.color_primary.replaceAll('|', '<br />'));
 		$('.profile .props .hair span').html(item.hair);
 		$('.profile .description').html(item.description);
 
@@ -560,8 +552,9 @@ var DPRA = function(){
 	
 	this.renderCategoryListControls = function(){
 		var 
+			scroller = $('.categories .scroller').get(0),
 			max = this.categoryItemWidth - $('.categories').width() - 1,
-			pos = $('.categories .scroller').get(0).scrollLeft;
+			pos = scroller ? scroller.scrollLeft : 0;
 		
 		if (pos < 1)
 		{
@@ -582,9 +575,6 @@ var DPRA = function(){
 		{
 			$('.categories .ico-keyboard-arrow-right').show();			
 		}
-		
-		lg(max);
-		lg(pos);
 	};
 	
 	this.renderList = function(type){
@@ -680,7 +670,6 @@ var DPRA = function(){
 		
 		if (Math.round($('.menu').position().left) === -245)
 		{
-			App.pushState({page: 'menu'});
 			$('.menu-overlay').show().animate({opacity: 1}, 300);
 			$('.menu').animate({left: 0}, 300);
 		}
@@ -694,7 +683,6 @@ var DPRA = function(){
 	this.toggleProfile = function(){
 		if (Math.round($('.profile').position().top) !== 0)
 		{
-			App.pushState({page: 'profile'});
 			$('.profile').animate({top: 0}, 300);
 		}
 		else
@@ -706,7 +694,6 @@ var DPRA = function(){
 	this.toggleFilters = function(){
 		if (Math.round($('.filter').position().top) !== 0)
 		{
-			App.pushState({page: 'filter'});
 			$('.filter').animate({top: 0}, 300);
 		}
 		else
@@ -718,7 +705,6 @@ var DPRA = function(){
 	this.toggleForm = function(){
 		if (Math.round($('.create').position().top) !== 0)
 		{
-			App.pushState({page: 'create'});
 			this.getPosition();
 			
 			$('.list .header').hide();
@@ -859,8 +845,30 @@ var DPRA = function(){
 											order: 'sort_order ASC'
 										},
 										success: function(r){
-											App.disasters = r.data;
-											App.renderDisasters();
+											xhr({
+												data: {
+													path: 'report/get',
+													fields: 'COUNT(report_id) AS total, disaster_id',
+													filter: '1 = 1 GROUP BY disaster_id',
+													order: 'total ASC'
+												},
+												success: function(res){
+													for (var i = 0; i < r.data.length; i++)
+													{
+														r.data[i].total = 0;
+														for (var j = 0; j < res.data.length; j++)
+														{
+															if (r.data[i].disaster_id === res.data[j].disaster_id)
+															{
+																r.data[i].total = res.data[j].total;
+															}
+														}
+													}
+													
+													App.disasters = r.data;
+													App.renderDisasters();
+												}
+											});
 										}
 									});
 
@@ -963,6 +971,12 @@ var DPRA = function(){
 	
 	this.logout = function(){
 		window.localStorage.setItem('dpra.user', null);
+		
+		this.user = {
+			id: null,
+			token: null
+		};
+		
 		this.fadeScreen(function(){
 			this.splash();
 			this.auth();
@@ -981,7 +995,6 @@ var DPRA = function(){
 			//});
 		}
 		
-		this.pushState({page: 'list'});
 		this.splash();
 		this.fetchResources();
 	};
@@ -1010,6 +1023,8 @@ var DPRA = function(){
 		}
 		else
 		{
+			history.replaceState({url: 'home'}, document.title, document.location.href);
+
 			$('html').removeClass('bg-gradient');
 			this.user = temp;
 			this.renderHome();
@@ -1022,29 +1037,87 @@ var DPRA = function(){
 var App = new DPRA();
 
 window.addEventListener('popstate', function(event){
-	return false;
-	//lg('pop state');
-	//lg(App.pageState);
-
-	//if (event.state === null) return false;
+	lg(event.state);
+	if (!App.user.id) return false;
 	
-	switch (App.pageState.page)
+	// check for opened popups
+	if ($('.profile').position().top === 0)
 	{
-		case 'create':
-			App.toggleForm();
-			break;
-		case 'filter':
-			App.toggleFilters();
-			break;
-		case 'profile':
-			App.toggleProfile();
-			break;
-		case 'menu':
-			App.toggleMenu();
-			break;
+		App.toggleProfile();
+		history.forward();
+		return false;
+	}
+	if ($('.create').position().top === 0)
+	{
+		App.toggleForm();
+		history.forward();
+		return false;
+	}
+	if ($('.filter').position().top === 0)
+	{
+		App.toggleFilters();
+		history.forward();
+		return false;
+	}
+	if ($('.menu').position().left === 0)
+	{
+		App.toggleMenu();
+		history.forward();
+		return false;
 	}
 	
-	App.pageState = event.state;
+	switch (event.state.url)
+	{
+		case 'home':
+			App.renderHome();
+			break;
+			
+		case 'select-disaster':
+			App.renderSelectDisasters();
+			break;
+			
+		case 'list-missing':
+			App.filters.disaster_id = event.state.id;
+			App.renderList('missing');
+			break;
+			
+		case 'my-reports':
+			App.reports();
+			break;
+			
+		case 'profile':
+			App.toggleProfile();
+			App.renderProfile(event.state.id);
+			break;
+			
+		case 'logout':
+			break;
+	}
+});
+
+$(document).on('click', 'a', function(e){
+	var 
+		a = $(e.target),
+		data = a.data();
+	
+	data.url = a.attr('href');
+	
+	if (data.url === 'logout')
+	{
+		var a = history.length -1;
+
+		history.go(-a);
+		window.location.href = 'index.html';
+	}
+	else
+	{
+		history.pushState(data, 'x', e.target.href);
+
+		lg('saving state');
+		lg(data);
+	}
+	
+	return e.preventDefault();
 });
 
 $(document).on('click', '.home .tab div', function(){
@@ -1145,7 +1218,7 @@ $(document).on('click', '.results .item', function(){
 $(document).on('click', '.btn-filter', App.toggleFilters);
 
 $(document).on('click', '.filter .btn-apply', function(){
-	App.toggleFilters();
+	history.back();
 	
 	App.filters = {
 		disaster_id: App.filters.disaster_id,
@@ -1165,7 +1238,9 @@ $(document).on('click', '.filter .btn-apply', function(){
 
 $(document).on('click', '.create-button', App.toggleForm.bind(App));
 
-$(document).on('click', '.create .btn-cancel', App.toggleForm);
+$(document).on('click', '.create .btn-cancel', function(){
+	history.back();
+});
 
 $(document).on('click', '.create .btn-create', function(){
 	if (!App.validate(['files', 'name', 'description', 'color'])) return false;
@@ -1258,7 +1333,11 @@ $(document).on('click', '.option', function(){
 	
 });
 
-$(document).on('click', '.toggle-menu, .menu-overlay', App.toggleMenu);
+$(document).on('click', '.toggle-menu', App.toggleMenu);
+
+$(document).on('click', '.menu-overlay', function(){
+	history.back();
+});
 
 $(document).on('click', '.categories .scroller .item', function(){
 	$('.categories .item').removeClass('active');

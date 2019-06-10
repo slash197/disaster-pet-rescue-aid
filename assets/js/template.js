@@ -25,14 +25,14 @@ var PageTemplate = {
 			'<div class="header">' +
 				'<span class="title">Disaster Pet Rescue AID</span><img src="assets/image/menu.png" />' +
 			'</div>' +
-			'<img src="assets/image/home.jpeg" />' +
+			'<div class="hero"><img src="assets/image/home.jpeg" /></div>' +
 			'<div class="content">' +
 				'<h1>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</h1>' +
 				'Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.' +
 			'</div>' +
 			'<div class="action">' +
-				'<button class="btn btn-white btn-donate">Donate</button>' +
-				'<button class="btn btn-blue btn-continue">Continue</button>' +
+				'<a href="#" class="btn btn-white btn-donate">Donate</a>' +
+				'<a href="select-disaster" class="btn btn-blue btn-continue">Continue</a>' +
 			'</div>' +
 		'</div>',
 

@@ -115,7 +115,8 @@
 	.location {
 		padding: 20px;
 		
-		.item {
+		a.item {
+			display: block;
 			margin-bottom: 30px;
 			cursor: pointer;
 				
@@ -177,6 +178,10 @@
 			left: 10px;
 			cursor: pointer;
 			font-size: 33px;
+			display: block;
+			width: 33px;
+			height: 33px;
+			line-height: 1;
 		}
 		img {
 			position: absolute;
@@ -185,6 +190,7 @@
 		}
 	}
 	.btn-filter {
+		display: block;
 		background-color: $silver;
 		line-height: 45px;
 		color: #a0a0a0;
@@ -306,6 +312,7 @@
 }
 
 .create-button {
+	display: block;
 	position: absolute;
 	bottom: 20px;
 	right: 20px;
