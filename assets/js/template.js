@@ -29,6 +29,7 @@ var PageTemplate = {
 			'<div class="content">' +
 				'<h1>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</h1>' +
 				'Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.' +
+				'<div class="location-disclaimer">DPRA needs your location in order to log the most recent sighting in it\'s appropriate place, as well as for populating the information map</div>' +
 			'</div>' +
 			'<div class="action">' +
 				'<a href="#" class="btn btn-white btn-donate">Donate</a>' +
