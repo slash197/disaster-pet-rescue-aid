@@ -87,12 +87,18 @@ class API
 			{
 				throw new RuntimeException('Failed to move uploaded file.');
 			}
-			
-			//$this->orientation($file);
-			$center = new \stojg\crop\CropCenter("../upload/{$file}");
-			
-			$croppedImage = $center->resizeAndCrop(1024, 576);
-			$croppedImage->writeimage("../upload/{$file}");
+
+			if ($ext === '.jpeg' || $ext === '.jpg')
+			{
+				$center = new \stojg\crop\CropCenter("../upload/{$file}");
+
+				$croppedImage = $center->resizeAndCrop(1024, 576);
+				$croppedImage->writeimage("../upload/{$file}");
+			}
+			else
+			{
+				
+			}
 
 			echo json_encode([
 				'status'	=> true,
@@ -118,15 +124,19 @@ class API
 		
 		if ($this->input->endpoint === 'location')
 		{
-			$result = json_decode(file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?latlng={$this->input->data['lat']},{$this->input->data['lng']}&key={$this->apiKey}&location_type=ROOFTOP&result_type=street_address"));
-			
+			$address = urlencode($this->input->data['address']);
+					
+			$result = json_decode(file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address={$address}&key={$this->apiKey}&location_type=ROOFTOP&result_type=street_address"));
+
 			if ($result->status === 'OK')
 			{
-				$this->input->data['address'] = $result->results[0]->formatted_address;
+				$this->input->data['lat'] = $result->results[0]->geometry->location->lat;
+				$this->input->data['lng'] = $result->results[0]->geometry->location->lng;
 			}
 			else
 			{
-				$this->input->data['address'] = 'Unknown address';
+				$this->input->data['lat'] = 0.00;
+				$this->input->data['lng'] = 0.00;
 			}
 		}
 		

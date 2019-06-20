@@ -40,6 +40,9 @@ var DPRA = function(){
 	this.popupEvent = 0;
 	this.pageState = null;
 	this.categoryItemWidth = 0;
+	this.stat = {
+		total: 0
+	};
 	
 	this.getCurrentPosition = function(callback){
 		navigator.geolocation.getCurrentPosition(
@@ -209,7 +212,7 @@ var DPRA = function(){
 		if (App.filters.gender !== 'any') str += ' AND gender = "' + App.filters.gender + '"';
 		if (App.filters.hair !== 'any') str += ' AND hair = "' + App.filters.hair + '"';
 		if (App.filters.altered !== 'unknown') str += ' AND altered = "' + App.filters.altered + '"';
-		str += ' AND patterns = "' + App.filters.patterns + '"';
+		if (App.filters.patterns !== 'any') str += ' AND patterns = "' + App.filters.patterns + '"';
 		
 		return str;
 	};
@@ -222,7 +225,7 @@ var DPRA = function(){
 		if (App.filters.hair !== 'any') label += App.filters.hair + ' hair; ';
 		if (App.filters.gender !== 'any') label += App.filters.gender + ';';
 		if (App.filters.altered !== 'unknown') label += App.filters.altered + ';';
-		label += App.filters.patterns + ';';
+		if (App.filters.patterns !== 'any') label += App.filters.patterns + ';';
 		
 		if (label === '') label = 'Filters';
 		
@@ -251,6 +254,7 @@ var DPRA = function(){
 						'<a href="quick-map" class="item" data-lat="' + item.lat + '" data-lng="' + item.lng + '">' +
 							'<span class="ico ico-location-on"></span>' +
 							'<div>' +
+								'<p>' + item.label + '</p>' +
 								'<p>' + item.address + '</p>' +
 								'<p>' + date.format('HH:mm on MMMM D, YYYY') + '</p>' +
 							'</div>' +
@@ -308,6 +312,12 @@ var DPRA = function(){
 		});
 	};
 	
+	this.about = function(){
+		this.fadeScreen(function(){
+			$('#app').html(PageTemplate.about);
+		});
+	};
+	
 	this.renderSelectDisasters = function(){
 		this.fadeScreen(function(){
 			$('#app').html(PageTemplate.disasters);
@@ -349,7 +359,7 @@ var DPRA = function(){
 		$('.map-popup .image').css('background-image', 'url(upload/' + item.files[0] + ')');
 		$('.map-popup .props .breed span').html(App.getBreed(item.breed_id));
 		$('.map-popup .props .gender span').html(item.gender);
-		$('.map-popup .props .color span').html(item.color.replaceAll('|', '<br />'));
+		$('.map-popup .props .color span').html(item.color_primary.replaceAll('|', '<br />'));
 		$('.map-popup .props .hair span').html(item.hair);
 		$('.map-popup .location').html(
 			'<p>' + item.address + '</p>' +
@@ -377,11 +387,12 @@ var DPRA = function(){
 		$('.results').html('<div class="spinner-holder"><div class="spinner s60 blue"></div></div>');
 		
 		this.category_id = $('.map-categories .item.active').attr('data-id');
+		var filterCategory = (this.category_id !== '0') ? ' AND r.category_id = ' + this.category_id : '';
 		
 		xhr({
 			data: {
 				path: 'query',
-				sql: 'SELECT l.location_id, l.lat, l.lng, l.date, l.address, r.report_id, r.name, r.files, r.color_primary, r.breed_id, r.hair, r.gender FROM location l, report r WHERE l.report_id = r.report_id AND r.category_id = ' + this.category_id + ' ORDER BY l.date DESC'
+				sql: 'SELECT l.location_id, l.lat, l.lng, l.date, l.address, r.report_id, r.name, r.files, r.color_primary, r.breed_id, r.hair, r.gender FROM location l, report r WHERE l.report_id = r.report_id ' + filterCategory + ' ORDER BY l.date DESC'
 			},
 			success: function(r){
 				$('.spinner-holder').remove();
@@ -437,7 +448,15 @@ var DPRA = function(){
 		
 		for (var i = 0; i < item.files.length; i++)
 		{
-			images += '<div class="swiper-slide" style="background-image: url(upload/' + item.files[i] + ')"></div>';
+			if ((item.files[i].indexOf('mp4') > -1) || (item.files[i].indexOf('mov') > -1))
+			{
+				images += '<video controls><source src="upload/' + item.files[i] + '" type="video/mp4"></video>';
+			}
+			else
+			{
+				images += '<div class="swiper-slide" style="background-image: url(upload/' + item.files[i] + ')"></div>';
+			}
+			
 			progress += '<div class="bar" style="width: ' + (100 / item.files.length) + '%"></div>';
 		}
 		
@@ -449,6 +468,7 @@ var DPRA = function(){
 		$('.profile .props .color span').html(item.color_primary.replaceAll('|', '<br />'));
 		$('.profile .props .hair span').html(item.hair);
 		$('.profile .description').html(item.description);
+		$('.profile .medical').html(item.medical);
 
 		this.getLocation(id);
 		
@@ -475,7 +495,7 @@ var DPRA = function(){
 			data: {
 				path: 'breed/get',
 				fields: 'breed_id, name',
-				filter: 'category_id = ' + this.category_id,
+				filter: (this.category_id !== '0') ? 'category_id = ' + this.category_id : '1 = 1',
 				order: 'sort_order ASC'
 			},
 			success: function(r){
@@ -484,11 +504,17 @@ var DPRA = function(){
 			}.bind(this)
 		});
 		
+		var filter = 'type = "' + this.page + '" AND status = "approved"';
+		
+		if (this.category_id !== '0') filter += ' AND category_id = ' + this.category_id;
+		
+		filter += this.buildFilterString();
+		
 		xhr({
 			data: {
 				path: 'report/get',
-				fields: 'report_id, name, description, breed_id, disaster_id, color_primary, color_secondary, patterns, gender, hair, microchip, altered, files, date',
-				filter: 'type = "' + this.page + '" AND status = "approved" AND category_id = ' + this.category_id + this.buildFilterString(),
+				fields: 'report_id, name, description, medical, breed_id, disaster_id, color_primary, color_secondary, patterns, gender, hair, microchip, altered, files, date',
+				filter: filter,
 				order: 'date DESC'
 			},
 			success: function(r){
@@ -498,11 +524,13 @@ var DPRA = function(){
 				
 				for (var id in this.list)
 				{
-					var item = this.list[id];
-					
+					var 
+						item = this.list[id],
+						path = ((item.files[0].indexOf('mp4') > -1) || (item.files[0].indexOf('mov') > -1)) ? 'assets/image/video.png' : 'upload/' + item.files[0];
+
 					$('.results').append(
 						'<div class="item" data-id="' + id + '">' +
-							'<img src="upload/' + item.files[0] + '" alt="item" />' +
+							'<img src="' + path + '" alt="item" />' +
 							'<div class="border"><>/div' +
 						'</div>'
 					);
@@ -518,6 +546,7 @@ var DPRA = function(){
 	
 	this.renderCategories = function(preselect){
 		var 
+			//html = '<div class="item" data-id="0">all</div>',
 			html = '',
 			c = null;
 	
@@ -584,6 +613,7 @@ var DPRA = function(){
 			$('#app').html(PageTemplate.list);
 		
 			$('.list .header .title').html(type.ucFirst());
+			$('.list .header .stat .value').html(this.stat.total);
 			
 			switch (type)
 			{
@@ -705,8 +735,6 @@ var DPRA = function(){
 	this.toggleForm = function(){
 		if (Math.round($('.create').position().top) !== 0)
 		{
-			this.getPosition();
-			
 			$('.list .header').hide();
 			$('.create').scrollTop(0);
 			$('.create h1').html('Create ' + this.page + ' pet report');
@@ -749,6 +777,15 @@ var DPRA = function(){
 		}
 		
 		return out;
+	};
+	
+	this.generateLocationLabel = function(){
+		switch (this.page)
+		{
+			case 'seen': return 'Seen at';
+			case 'missing': return 'Missing from';
+			case 'found': return 'Found at';
+		}
 	};
 	
 	this.validate = function(form){
@@ -839,6 +876,16 @@ var DPRA = function(){
 									
 									xhr({
 										data: {
+											path: 'query',
+											sql: 'SELECT COUNT(report_id) AS total FROM report'
+										},
+										success: function(r){
+											App.stat.total = r.data[0].total;
+										}
+									});
+									
+									xhr({
+										data: {
 											path: 'disaster/get',
 											fields: 'disaster_id, name, type',
 											filter: '1 = 1',
@@ -914,8 +961,8 @@ var DPRA = function(){
 		$('.create .btn-upload').dmUploader({
 			url: 'api/upload',
 			dnd: false,
-			allowedTypes: 'image/*',
-			extFilter: ["jpg", "jpeg", "png"],
+			//allowedTypes: 'image/*',
+			extFilter: ["jpg", "jpeg", "mp4", "mov"],
 			onUploadProgress: function(id, percent){
 				$('.btn-upload .progress .bar').css('width', percent + '%');
 			},
@@ -935,7 +982,14 @@ var DPRA = function(){
 					});
 				}
 				
-				$('.uploads').append('<div data-path="' + r.path + '" style="background-image: url(upload/' + r.path + ')"><span class="ico ico-delete"></span></div>');
+				if (r.path.indexOf('mp4') > -1 || r.path.indexOf('mov') > -1)
+				{
+					$('.uploads').append('<div data-path="' + r.path + '" style="background-image: url(assets/image/video.png)"><span class="ico ico-delete"></span></div>');
+				}
+				else
+				{
+					$('.uploads').append('<div data-path="' + r.path + '" style="background-image: url(upload/' + r.path + ')"><span class="ico ico-delete"></span></div>');
+				}
 			},
 			onUploadError: function(id, xhr, status, error){
 				$('.btn-upload .progress .bar').css('width', 0 + '%');
@@ -1037,7 +1091,7 @@ var DPRA = function(){
 var App = new DPRA();
 
 window.addEventListener('popstate', function(event){
-	lg(event.state);
+	//lg(event.state);
 	if (!App.user.id) return false;
 	
 	// check for opened popups
@@ -1113,8 +1167,8 @@ $(document).on('click', 'a', function(e){
 	{
 		history.pushState(data, 'x', e.target.href);
 
-		lg('saving state');
-		lg(data);
+		//lg('saving state');
+		//lg(data);
 	}
 	
 	return e.preventDefault();
@@ -1243,13 +1297,7 @@ $(document).on('click', '.create .btn-cancel', function(){
 });
 
 $(document).on('click', '.create .btn-create', function(){
-	if (!App.validate(['files', 'name', 'description', 'color'])) return false;
-	
-	if (!App.position.status)
-	{
-		App.notify('Please enable Location services to upload your report', 'error');
-		return false;
-	}
+	if (!App.validate(['files', 'name', 'description', 'color_primary', 'address'])) return false;
 
 	xhr({
 		data: {
@@ -1261,6 +1309,7 @@ $(document).on('click', '.create .btn-create', function(){
 				color_secondary: App.option2param('color_secondary', 'create'),
 				files: App.option2param('files', 'create'),
 				description: $('[name="description"]').val(),
+				medical: $('[name="medical"]').val(),
 				microchip: $('[name="microchip"]').val(),
 				hair: App.option2param('hair', 'create'),
 				gender: App.option2param('gender', 'create'),
@@ -1286,9 +1335,9 @@ $(document).on('click', '.create .btn-create', function(){
 					path: 'location/create',
 					data: {
 						report_id: r.id,
-						lat: App.position.lat,
-						lng: App.position.lng,
-						date: moment().unix()
+						address: $('[name="address"]').val(),
+						date: moment().unix(),
+						label: App.generateLocationLabel()
 					}
 				},
 				success: function(r){

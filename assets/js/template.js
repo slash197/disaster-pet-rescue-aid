@@ -20,6 +20,16 @@ var PageTemplate = {
 			'<p><a href="#" class="link-sign-up">Sign up</a></p>' +
 		'</div>',
 
+	about:
+		'<div class="about">' +
+			'<div class="header">' +
+				'<span class="ico ico-menu toggle-menu"></span><span class="title">About us</span><img src="assets/image/menu.png" />' +
+			'</div>' +
+			'<div class="content">' +
+				'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.' +
+			'</div>' +
+		'</div>',
+
 	home: 
 		'<div class="home">' +
 			'<div class="header">' +
@@ -87,6 +97,7 @@ var PageTemplate = {
 		'<div class="list">' +
 			'<div class="header">' +
 				'<span class="ico ico-menu toggle-menu"></span><span class="title"></span><img src="assets/image/menu.png" />' +
+				'<div class="stat"><span class="value"></span> pets helped to date</div>' +
 			'</div>' +
 			'<div class="shadow">' +
 				'<div class="btn-filter">' +

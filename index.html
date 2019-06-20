@@ -33,7 +33,7 @@
 			<div class="slider">
 				<div class="swiper-container">
 					<div class="swiper-wrapper"></div>
-					<div class="swiper-overlay"></div>
+					<!--<div class="swiper-overlay"></div>-->
 				</div>
 				<div class="name"></div>
 				<div class="progress"></div>
@@ -45,6 +45,7 @@
 				<div class="hair"><label>hair</label><span></span></div>
 			</div>
 			<div class="description"></div>
+			<div class="medical"></div>
 			<div class="location"></div>
 		</div>
 		
@@ -81,7 +82,8 @@
 			</div>
 			<div class="field" data-tag="patterns" data-multi="false">
 				<label>pattern</label>
-				<span class="option selected">solid</span>
+				<span class="option selected">any</span>
+				<span class="option">solid</span>
 				<span class="option">stripes</span>
 				<span class="option">spots</span>
 			</div>
@@ -133,7 +135,7 @@
 					</div>
 				</div>
 				<div class="field">
-					<label>name</label>
+					<label>pet name</label>
 					<input type="text" name="name" aria-label="Name" />
 				</div>
 				<div class="field">
@@ -145,12 +147,16 @@
 					</div>
 				</div>
 				<div class="field">
-					<label>microchip</label>
+					<label>microchip number</label>
 					<input type="text" name="microchip" placeholder="optional" aria-label="Microchip" />
 				</div>
 				<div class="field">
 					<label>description</label>
 					<textarea name="description" placeholder="Please provide as much information as possible. Be sure to include specifics as special markings, bobbed tail, extra toes, etc."  aria-label="Description"></textarea>
+				</div>
+				<div class="field">
+					<label>medical issues</label>
+					<textarea name="medical" placeholder="Please list any surgeries such as amputations, medications, special diet, etc."  aria-label="Medical issues"></textarea>
 				</div>
 				<div class="field" data-tag="color_primary" data-multi="true">
 					<label>primary color</label>
@@ -168,6 +174,7 @@
 					<label>gender</label>
 					<span class="option selected">male</span>
 					<span class="option">female</span>
+					<span class="option">unknown</span>
 				</div>
 				<div class="field" data-tag="hair" data-multi="false">
 					<label>hair</label>
@@ -181,9 +188,9 @@
 					<span class="option">yes</span>
 					<span class="option">unknown</span>
 				</div>
-				<div class="field" data-tag="geolocation" style="display: none">
+				<div class="field" data-tag="geolocation">
 					<label>location</label>
-					<input type="text" name="location" placeholder="address" />
+					<input type="text" name="address" placeholder="Address" />
 				</div>
 			</div>
 			<p>
@@ -208,6 +215,7 @@
 				<a href="list-rb" data-page="renderList" data-type="rb"><span class="ico ico-looks"></span>Rainbow Bridge</a>
 				<a href="map" data-page="renderMap"><span class="ico ico-location-on"></span>Map</a>
 				<a href="my-reports" data-page="reports"><span class="ico ico-assignment-turned-in"></span>My reports</a>
+				<a href="about" data-page="about"><span class="ico  ico-info-outline"></span>About us</a>
 				<a href="logout" data-page="logout"><span class="ico ico-exit-to-app"></span>Log out</a>
 			</div>
 			<div class="footer">© 2019 DPRA <span>v1.0.0</span></div>
@@ -219,8 +227,5 @@
 		</div>
 		
 		<script src="assets/js/loader.js"></script>
-		<script>
-			(function(t,r,a,c,k,x){k=t.createElement(r),x=t.getElementsByTagName(r)[0],k.async=1;k.src=a+'?_='+new Date().getTime();k.onload=function(){AX.init(c);};x.parentNode.insertBefore(k,x);})(document,'script','//slashwebdesign.studio/analytics/analytics.js','CID-XXX-0000');
-		</script>
 	</body>
 </html>

@@ -109,7 +109,8 @@
 			}
 		}
 	}
-	.description {
+	.description,
+	.medical {
 		padding: 20px;
 	}
 	.location {
@@ -187,6 +188,15 @@
 			position: absolute;
 			top: 10px;
 			right: 10px;
+		}
+		.stat {
+			font-weight: 300;
+			font-size: 14px;
+			text-align: left;
+			line-height: 30px;
+			padding: 0px 20px;
+			color: $white;
+			background-color: #a0a0a0;
 		}
 	}
 	.btn-filter {
