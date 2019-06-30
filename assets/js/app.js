@@ -334,8 +334,8 @@ var DPRA = function(){
 		{
 			if (this.disasters[i].type === type)
 			{
-				check = (App.filters.disaster_id === this.disasters[i].disaster_id) ? '<span class="ico ico-check"></span>' : '';
-				html += '<a href="list-missing" class="item" data-id="' + this.disasters[i].disaster_id + '" style="background-image: url(assets/image/disaster.jpg)"><div>' + check + this.disasters[i].name + ' (' + this.disasters[i].total + ')</div></a>';
+				//check = (App.filters.disaster_id === this.disasters[i].disaster_id) ? '<span class="ico ico-check"></span>' : '';
+				html += '<a href="list-missing" class="item" data-id="' + this.disasters[i].disaster_id + '" style="background-image: url(assets/image/disaster.jpg)"><div>' + this.disasters[i].name + '</div></a>';
 			}
 		}
 
