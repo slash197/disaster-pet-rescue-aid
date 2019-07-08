@@ -643,6 +643,12 @@ var DPRA = function(){
 		});
 	};
 	
+	this.renderReset = function(){
+		this.fadeScreen(function(){
+			$('#app').html(PageTemplate.forgot);
+		});
+	};
+	
 	this.renderColors = function(){
 		var html = '';
 		
@@ -684,6 +690,34 @@ var DPRA = function(){
 		$('.create .dropdown[data-tag="breed"] .selection').html('').attr('data-id', '0');
 		$('.create .dropdown[data-tag="breed"] ul').html(html);
 		$('.create .dropdown[data-tag="breed"] ul li:first-child').trigger('click');
+	};
+	
+	this.resetPassword = function(){
+		let email = $('input[name="reset-email"]').val();
+		
+		if (!email)
+		{
+			this.notify('Please fill in your email address', 'error');
+			return false;
+		}
+		
+		$('input[name="reset-email"]').val('');
+		xhr({
+			data: {
+				path: 'reset',
+				email: email
+			},
+			success: function(r){
+				if (r.status)
+				{
+					this.notify('Your password has been reset and emailed to you', 'success');
+				}
+				else
+				{
+					this.notify(r.error, 'error');
+				}
+			}.bind(this)
+		});
 	};
 	
 	this.getBreed = function(id){
@@ -1069,7 +1103,7 @@ var DPRA = function(){
 
 		if (!temp)
 		{
-			$('html').addClass('bg-gradient');
+			$('body').addClass('bg-gradient');
 			$('.splash').append(
 				'<p><button class="btn btn-white btn-sign-up">sign up</button></p>' +
 				'<p><button class="btn btn-blue btn-sign-in">sign in</button></p>'
@@ -1410,6 +1444,10 @@ $(document).on('click', '.sign-in .btn-sign-in', function(){
 	App.signIn();
 });
 
+$(document).on('click', '.sign-in .btn-reset', function(){
+	App.resetPassword();
+});
+
 $(document).on('click', '.splash .btn-sign-up', function(){
 	App.renderSignUp();
 });
@@ -1423,9 +1461,14 @@ $(document).on('click', '.splash .btn-sign-in', function(){
 	App.renderSignIn();
 });
 
-$(document).on('click', '.sign-up .link-sign-in', function(e){
+$(document).on('click', '.sign-up .link-sign-in, .sign-in .link-sign-in', function(e){
 	e.preventDefault();
 	App.renderSignIn();
+});
+
+$(document).on('click', '.sign-in .link-forgot', function(e){
+	e.preventDefault();
+	App.renderReset();
 });
 
 $(document).on('focus', 'input', function(){

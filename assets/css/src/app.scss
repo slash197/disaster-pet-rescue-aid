@@ -14,7 +14,6 @@
 @import '_home';
 
 html {
-	background-color: $white;
 	padding: 0px;
 	margin: 0px;
 	width: 100%;
@@ -24,7 +23,7 @@ html {
 	position: fixed;
 	
 	body {
-		background-color: transparent;
+		background-color: $white;
 		padding: 0px;
 		margin: 0px;
 		height: 100%;

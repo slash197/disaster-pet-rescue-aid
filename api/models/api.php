@@ -30,6 +30,11 @@ class API
 		}
 	}
 	
+	public function reset()
+	{
+		$this->respond($this->auth->reset());
+	}
+	
 	public function signIn()
 	{
 		$this->respond($this->auth->signIn());

@@ -65,10 +65,12 @@
 		color: #a0a0a0;
 		
 		.link-sign-up,
+		.link-forgot,
 		.link-sign-in {
 			color: $white;
 		}
 		.link-sign-up:hover,
+		.link-forgot:hover,
 		.link-sign-in:hover {
 			color: $silver;
 		}

@@ -18,6 +18,15 @@ var PageTemplate = {
 			'<p class="btn-holder"><button class="btn btn-sign-in btn-blue">sign in</button></p>' +
 			'<p>Don\'t have an account yet?</p>' +
 			'<p><a href="#" class="link-sign-up">Sign up</a></p>' +
+			'<p><a href="" class="link-forgot">Forgot password</a></p>' +
+		'</div>',
+
+	forgot:
+		'<div class="sign-in">' +
+			'<div class="logo"><img src="assets/image/logo.big.white.png" /></div>' +
+			'<div class="row"><div class="input-box"><span class="ico ico-email"></span><input type="text" name="reset-email" placeholder="Email address" /></div></div>' +
+			'<p class="btn-holder"><button class="btn btn-reset btn-blue">reset password</button></p>' +
+			'<p><a href="" class="link-sign-in">Back</a></p>' +
 		'</div>',
 
 	about:
